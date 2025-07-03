@@ -4,7 +4,7 @@ COPY frontend/ ./frontend
 WORKDIR /app/frontend
 RUN npm install && npm run build
 
-FROM maven:3.9-eclipse-temurin-17 AS backend-builder
+FROM maven:3.9-eclipse-temurin-19 AS backend-builder
 WORKDIR /app
 COPY backend/ ./backend
 WORKDIR /app/backend
