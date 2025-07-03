@@ -10,7 +10,7 @@ COPY backend/ ./backend
 WORKDIR /app/backend
 RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:17-jdk
+FROM eclipse-temurin:19-jdk
 WORKDIR /app
 
 COPY --from=backend-builder /app/backend/target/*.jar app.jar
