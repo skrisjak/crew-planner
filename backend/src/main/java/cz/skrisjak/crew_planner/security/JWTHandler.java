@@ -23,9 +23,6 @@ public class JWTHandler implements AuthenticationSuccessHandler {
     @Value("${security.jwt.secret}")
     private String secret;
 
-    @Value("${address}")
-    private String client;
-
     @Autowired
     public JWTHandler(UserRepository userRepository) {
         this.userRepository = userRepository;
