@@ -38,8 +38,16 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/oauth2**").permitAll()
-                                .anyRequest().authenticated())
+                        auth.requestMatchers(
+                                "/",
+                                "/index.html",
+                                "/static/**",
+                                "/favicon.ico",
+                                "/manifest.json",
+                                "/logo*.png",
+                                "/asset-manifest.json"
+                        ).permitAll()
+                        .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(user -> user.userService(oAuth))
                         .successHandler(jwtHandler)
@@ -52,10 +60,10 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000")); // nebo "*" pokud chceš absolutně otevřít
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // všechny potřebné HTTP metody
-        config.setAllowedHeaders(List.of("*")); // povol všechny hlavičky
-        config.setAllowCredentials(true); // pokud posíláš cookies nebo autorizační hlavičku
+        config.setAllowedOrigins(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

@@ -23,6 +23,9 @@ public class JWTHandler implements AuthenticationSuccessHandler {
     @Value("${security.jwt.secret}")
     private String secret;
 
+    @Value("${address}")
+    private String client;
+
     @Autowired
     public JWTHandler(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -39,16 +42,20 @@ public class JWTHandler implements AuthenticationSuccessHandler {
 
         if (principal instanceof OidcUser oidcUser) {
             email = oidcUser.getEmail();
+
+            System.out.println(oidcUser);
+            System.out.println("Picture: " +oidcUser.getPicture());
+
             user = userRepository.findByEmail(email);
             if (user == null) {
                 throw new ServletException("User has no access");
             }
-            user.setImageUrl(oidcUser.getPicture());
-
+            user.setImage(oidcUser.getPicture());
+            userRepository.save(user);
         } else {
             throw new ServletException("Unexpected principal type: " + principal.getClass().getName());
         }
-        response.sendRedirect("http://localhost:3000/#token="+generateToken(email));
+        response.sendRedirect(client + "#token=" + generateToken(email));
     }
 
     public String generateToken(String email) {

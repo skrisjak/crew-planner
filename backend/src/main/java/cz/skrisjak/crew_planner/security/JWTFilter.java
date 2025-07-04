@@ -70,7 +70,6 @@ public class JWTFilter extends OncePerRequestFilter {
             if (user != null) {
                 SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user, null, getUserAuthorities(user)));
                 LOG.debug("User: " + userEmail);
-                filterChain.doFilter(request, response);
             } else {
                 throw new Exception("User not found");
             }

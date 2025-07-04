@@ -2,36 +2,56 @@ import CONF from "./CONF";
 
 class API {
 
-    static doRequest = async (endpoint) => {
+    static doRequest = async (endpoint, method = "GET",data = null ) => {
 
-        const token = localStorage.getItem("token").trim();
+        const token = localStorage.getItem("token");
 
-        console.log("Executing call with " + token);
+        if (token !== null) {
+            const url = CONF.origin + endpoint;
+            const body = JSON.stringify(data);
 
-        if (token) {
+            console.log("→" + method + " " + url + (data? ("\n" + body) : ""));
+
             try {
-                const response = await fetch(CONF.origin + endpoint, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`
-                    }
-                });
 
-                if (response.status !== 403) {
-                    return response.json();
+                const headers = {"Authorization": `Bearer ${token.trim()}`};
+
+                let init;
+                if (data !== null) {
+                    init = {
+                        method: method,
+                        headers: headers,
+                        body: body,
+                    }
+                } else {
+                    init = {
+                        method: method,
+                        headers: headers,
+                    }
                 }
 
-            } catch (e) {
+                const response = await fetch(url, init);
+
+                if (response.status === 403 && response.status === 401) {
+                    localStorage.removeItem("token");
+                    throw new Error("Unauthorized");
+                } else {
+                    const responded =  await response.json();
+                    console.log("←" + method + " " + url + "\n" + JSON.stringify(responded));
+                    return responded;
+                }
+
+            } catch (error) {
                 throw new Error("Network Error");
             }
 
+        } else {
+            throw new Error("Unauthorized");
         }
-
-        throw new Error("Unauthorized");
     }
 
-
     static getUserData = async () => {
-        return await API.doRequest("hello");
+        return await API.doRequest("user/me");
     }
 }
 

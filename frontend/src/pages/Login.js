@@ -1,6 +1,7 @@
-import './App.css';
+import '../App.css';
 import {useEffect} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
+import CONF from "../api/CONF";
 
 
 function Login() {
@@ -14,7 +15,6 @@ function Login() {
             const params = new URLSearchParams(hash.substring(1));
             const token = params.get("token");
             if (token) {
-                console.log(token);
                 localStorage.setItem("token", token);
                 navigate("/home");
             }
@@ -22,7 +22,7 @@ function Login() {
     }, [location, navigate]);
     return (
       <>
-        <button onClick={() => window.location.href="http://localhost:8080/login/oauth2/google"}>Log in</button>
+        <button onClick={() => window.location.href= (CONF.origin+"login/oauth2/google")}>Log in</button>
       </>
   );
 }
