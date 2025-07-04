@@ -2,12 +2,14 @@ FROM node:20 AS frontend-builder
 WORKDIR /app
 COPY frontend/ ./frontend
 WORKDIR /app/frontend
+ARG REACT_APP_URL
+ENV REACT_APP_URL=$REACT_APP_URL
 RUN npm install && npm run build
 
 FROM maven:3.9-eclipse-temurin-19 AS backend-builder
 WORKDIR /app
 COPY backend/ ./backend
-COPY --from=frontend-builder /app/frontend/build /app/backend/src/main/resources/static
+COPY --from=frontend-builder /app/frontend/build /app/backend/src/main/resources/statice
 WORKDIR /app/backend
 RUN mvn clean package -DskipTests
 
