@@ -23,6 +23,9 @@ public class JWTHandler implements AuthenticationSuccessHandler {
     @Value("${security.jwt.secret}")
     private String secret;
 
+    @Value("${address}")
+    private String frontend;
+
     @Autowired
     public JWTHandler(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -52,7 +55,7 @@ public class JWTHandler implements AuthenticationSuccessHandler {
         } else {
             throw new ServletException("Unexpected principal type: " + principal.getClass().getName());
         }
-        response.sendRedirect("https://beachsmeny.up.railway.app/#token=" + generateToken(email));
+        response.sendRedirect(frontend + "#token=" + generateToken(email));
     }
 
     public String generateToken(String email) {
