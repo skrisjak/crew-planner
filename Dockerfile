@@ -9,7 +9,7 @@ RUN npm install && npm run build
 FROM maven:3.9-eclipse-temurin-19 AS backend-builder
 WORKDIR /app
 COPY backend/ ./backend
-COPY --from=frontend-builder /app/frontend/build /app/backend/src/main/resources/statice
+COPY --from=frontend-builder /app/frontend/build /app/backend/src/main/resources/static
 WORKDIR /app/backend
 RUN mvn clean package -DskipTests
 
