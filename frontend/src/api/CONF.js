@@ -1,5 +1,5 @@
 const CONF  = {
-    origin: process.env.REACT_APP_URL? process.env.REACT_APP_URL :"http://localhost:8080/",
+    origin: process.env.REACT_APP_URL? process.env.REACT_APP_URL : window.location.origin + '/',
 }
 
 export default CONF;
