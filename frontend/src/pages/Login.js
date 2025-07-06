@@ -8,6 +8,8 @@ function Login() {
     const location = useLocation();
     const navigate = useNavigate();
 
+    console.log("react_app_url : " + CONF.origin);
+
     useEffect(() => {
         const hash = location.hash;
 
@@ -22,7 +24,7 @@ function Login() {
     }, [location, navigate]);
     return (
       <>
-        <button onClick={() => window.location.href= (CONF.origin+"login/oauth2/google")}>Log in</button>
+        <button onClick={() => window.location.href= ("https://beachsmeny.up.railway.app/login/oauth2/google")}>Log in</button>
       </>
   );
 }

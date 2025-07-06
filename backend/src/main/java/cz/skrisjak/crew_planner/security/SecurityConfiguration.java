@@ -69,4 +69,17 @@ public class SecurityConfiguration {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
+
+    @Bean
+    public WebServerFactoryCustomizer<TomcatServletWebServerFactory> tomcatCustomizer() {
+        return server -> server.addContextCustomizers(context ->
+                context.setUseRelativeRedirects(false)
+        );
+    }
+
+    @Bean
+    public ForwardedHeaderFilter forwardedHeaderFilter() {
+        return new ForwardedHeaderFilter();
+    }
+
 }
