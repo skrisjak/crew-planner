@@ -18,8 +18,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +29,9 @@ public class JWTFilter extends OncePerRequestFilter {
 
     private final JwtParser jwtParser;
     private UserService userService;
+
+    @Value("${address}")
+    private String frontend;
 
     @Autowired
     public JWTFilter(@Value("${security.jwt.secret}") String secret, UserService userService) {
@@ -57,8 +58,7 @@ public class JWTFilter extends OncePerRequestFilter {
         try {
             userEmail = extractUsername(token);
         } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write(e.getMessage()+'\n');
+            response.sendRedirect(frontend + "#error=AuthenticationError");
             e.printStackTrace(response.getWriter());
             return;
         }

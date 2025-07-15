@@ -1,14 +1,12 @@
-import '../App.css';
-import {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import CONF from "../api/CONF";
-
+import {Alert, Box, IconButton, Typography} from "@mui/material";
 
 function Login() {
     const location = useLocation();
     const navigate = useNavigate();
-
-    console.log("react_app_url : " + CONF.origin);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         const hash = location.hash;
@@ -20,12 +18,25 @@ function Login() {
                 localStorage.setItem("token", token);
                 navigate("/home");
             }
+            const error = params.get("error");
+            if (error) {
+                setError(error);
+            }
         }
     }, [location, navigate]);
     return (
-      <>
-        <button onClick={() => window.location.href= ("https://beachsmeny.up.railway.app/login/oauth2/google")}>Log in</button>
-      </>
+      <Box sx={{width:"100vw",height:"100vh",alignItems: 'center', display: 'flex', flexDirection:'column', justifyContent: 'space-evenly', boxSizing:"border-box"}}>
+          <Box sx={{padding:"10px", display:"flex", flexDirection:"column", justifyContent:"space-between", alignItems:"center", boxSizing:"border-box"}}>
+              <Typography variant="h4" fontFamily="Nova Mono" sx={{marginBottom:"15px"}}>
+                  <span className="material-symbols-outlined">calendar_month</span>
+                  ShiftBoard
+              </Typography>
+            <IconButton onClick={() => window.location.href= (CONF.origin + "login/oauth2/google")} sx={{borderRadius:0, display:"inline-flex", justifyContent:"space-between"}}>
+                <img src="google.svg" alt="logo" color="white"/><Typography sx={{marginLeft:"15px"}}>Přihlásit se</Typography>
+            </IconButton>
+              {error && <Alert severity="error" sx={{}}>{error}</Alert>}
+          </Box>
+      </Box>
   );
 }
 

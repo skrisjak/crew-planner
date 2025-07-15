@@ -48,7 +48,9 @@ public class JWTHandler implements AuthenticationSuccessHandler {
 
             user = userRepository.findByEmail(email);
             if (user == null) {
-                throw new ServletException("User has no access");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.sendRedirect(frontend + "#error=Unauthorized");
+                return;
             }
             user.setImage(oidcUser.getPicture());
             userRepository.save(user);
