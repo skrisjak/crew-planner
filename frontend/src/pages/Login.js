@@ -32,9 +32,9 @@ function Login() {
                   ShiftBoard
               </Typography>
             <IconButton onClick={() => window.location.href= (CONF.origin + "login/oauth2/google")} sx={{borderRadius:0, display:"inline-flex", justifyContent:"space-between"}}>
-                <img src="google.svg" alt="logo" color="white"/><Typography sx={{marginLeft:"15px"}}>Přihlásit se</Typography>
+                <img src="/google.svg" alt="logo" color="white"/><Typography sx={{marginLeft:"15px"}}>Přihlásit se</Typography>
             </IconButton>
-              {error && <Alert severity="error" sx={{}}>{error}</Alert>}
+              {error && <Alert severity="error">{error}</Alert>}
           </Box>
       </Box>
   );
