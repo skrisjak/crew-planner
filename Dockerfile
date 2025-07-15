@@ -13,9 +13,9 @@ COPY --from=frontend-builder /app/frontend/build /app/backend/src/main/resources
 WORKDIR /app/backend
 RUN mvn clean package -DskipTests
 
-FROM eclipse-temurin:19-jdk
+FROM eclipse-temurin:19-jre
 WORKDIR /app
 
 COPY --from=backend-builder /app/backend/target/*.jar app.jar
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "-Xmx=256m","app.jar"]
