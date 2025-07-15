@@ -4,7 +4,7 @@ COPY frontend/ ./frontend
 WORKDIR /app/frontend
 ARG REACT_APP_URL
 ENV REACT_APP_URL=$REACT_APP_URL
-RUN npm install && npm run build
+RUN npm install && rm -rf build && npm run build
 
 FROM maven:3.9-eclipse-temurin-19 AS backend-builder
 WORKDIR /app
