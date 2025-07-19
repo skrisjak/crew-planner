@@ -19,25 +19,19 @@ class API {
                 headers,
                 ...(data !== null && { body: JSON.stringify(data) }),
             };
-            try {
-                const response = await fetch(url, init);
 
-                if (response.status === 401) {
-                    localStorage.removeItem("token");
-                    window.location.href = CONF.origin + "#error=Unauthorized";
-                } else if (response.status === 404 || response.status === 403) {
-                    return null;
-                } else {
-                    const responded = await response.json();
-                    console.log("←" + method + " " + url + "\n" + JSON.stringify(responded));
-                    return responded;
-                }
-            } catch (error) {
-                console.error(error);
-                window.location.href = CONF.origin + "#error=NetworkError";
+            const response = await fetch(url, init);
+
+            if (response.status === 401) {
+                localStorage.removeItem("token");
+                throw new Error("Unauthorized");
+            } else if (response.status === 404 || response.status === 403) {
+                throw new Error("Unauthorized");
+            } else {
+                const responded = await response.json();
+                console.log("←" + method + " " + url + "\n" + JSON.stringify(responded));
+                return responded;
             }
-        } else {
-            window.location.href = CONF.origin + "#error=NoAuthorization";
         }
     }
 
