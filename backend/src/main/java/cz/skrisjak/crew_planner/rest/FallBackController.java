@@ -8,6 +8,6 @@ public class FallBackController {
 
     @RequestMapping( "/**")
     public String forward() {
-        return "forward:/";
+        return "forward:/index.html";
     }
 }
