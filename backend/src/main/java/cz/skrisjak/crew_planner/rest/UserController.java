@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
+@PreAuthorize("isAuthenticated()")
 public class UserController {
     private UserService userService;
 

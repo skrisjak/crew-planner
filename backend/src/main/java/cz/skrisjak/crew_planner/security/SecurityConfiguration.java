@@ -42,18 +42,7 @@ public class SecurityConfiguration {
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(
-                                "/",
-                                "/index.html",
-                                "/static/**",
-                                "/oauth2/**",
-                                "/favicon.ico",
-                                "/manifest.json",
-                                "/logo*.png",
-                                "/asset-manifest.json",
-                                "/google.svg"
-                        ).permitAll()
-                        .anyRequest().authenticated())
+                        auth.anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(user -> user.userService(oAuth))
                         .successHandler(jwtHandler)
