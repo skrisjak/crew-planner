@@ -45,7 +45,7 @@ public class SecurityConfiguration {
                         auth.requestMatchers(
                                 "/",
                                 "/index.html",
-                                "static/*",
+                                "/static/*",
                                 "/oauth2/**",
                                 "/favicon.ico",
                                 "/manifest.json",
