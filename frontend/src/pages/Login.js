@@ -6,7 +6,7 @@ import {Alert, Box, IconButton, Typography} from "@mui/material";
 function Login() {
     const location = useLocation();
     const navigate = useNavigate();
-    const [error, setError] = useState(null);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         const hash = location.hash;
@@ -31,10 +31,10 @@ function Login() {
                   <span className="material-symbols-outlined">calendar_month</span>
                   ShiftBoard
               </Typography>
-            <IconButton onClick={() => window.location.href= (CONF.origin + "login/oauth2/google")} sx={{borderRadius:0, display:"inline-flex", justifyContent:"space-between"}}>
+            <IconButton onClick={() => window.location.href= (CONF.origin + "oauth2/authorization/google")} sx={{borderRadius:0, display:"inline-flex", justifyContent:"space-between"}}>
                 <img src="/google.svg" alt="logo" color="white"/><Typography sx={{marginLeft:"15px"}}>Přihlásit se</Typography>
             </IconButton>
-              {error && <Alert severity="error">{error}</Alert>}
+              {error!=="" && <Alert severity="error">{error}</Alert>}
           </Box>
       </Box>
   );

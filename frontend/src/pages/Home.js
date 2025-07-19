@@ -1,50 +1,63 @@
-import {useEffect, useState} from "react";
-import API from "../api/API";
-import {useNavigate} from "react-router-dom";
+import {useState} from "react";
 import PageLayout from "./PageLayout";
-import {DateCalendar, DatePicker, LocalizationProvider} from "@mui/x-date-pickers";
+import {DateCalendar, LocalizationProvider, MobileDatePicker} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/cs";
 import dayjs from "dayjs";
+import {useResponsive} from "../hooks/Responsive";
+import {usePlan} from "../hooks/Plan";
+import {Box, CircularProgress, Divider} from "@mui/material";
+import WorkDay from "./components/WorkDay";
 
 function Home() {
-    const [mobile, setMobile] = useState(window.innerWidth <= 800);
-    const [fullScreen, setFullScreen] = useState(window.innerWidth === window.screen.width);
-    const redirect = useNavigate();
-    const [profile, setProfile] = useState(null);
+    const {mobile, fullScreen} =useResponsive();
+    const [selectedDate, setSelectedDate] = useState(dayjs());
+    const {loading, plan, updatePlan} = usePlan();
+    const [open, setOpen] = useState(false);
 
-    window.addEventListener("resize", ()=> {
-        setMobile(window.innerWidth <= 800);
-        setFullScreen(window.innerWidth === window.screen.width);
-    })
-
-    useEffect(() => {
-
-        const getProfile = async () => {
-            try {
-                const newProfile = await API.getUserData();
-                setProfile(newProfile);
-            } catch (err) {
-                redirect("/");
-            }
-        }
-        getProfile();
-    },[redirect]);
+    const updateCalenderView = (date) => {
+        setSelectedDate(date);
+        setOpen(false);
+        updatePlan(date);
+    }
 
     return (
         <PageLayout
-            profile={profile}
             calendar={
                 mobile? null :
                     <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="cs">
                         {fullScreen ?
-                            <DateCalendar defaultValue={dayjs()} showDaysOutsideCurrentMonth fixedWeekNumber={6} sx={{width:"100%", aspectRatio:1}}/> :
-                            <DatePicker/>
+                            <DateCalendar value={selectedDate} defaultValue={selectedDate} showDaysOutsideCurrentMonth fixedWeekNumber={6} onChange={updateCalenderView} sx={{width:'100%', height:"auto"}}/> :
+                            <MobileDatePicker value={selectedDate} onChange={updateCalenderView} sx={{width:"100%"}} open={open} onOpen={() => setOpen(true)}/>
                         }
                     </LocalizationProvider>
             }
         >
-            něco bla bla bla
+            {mobile?
+                <Box sx={{display:"flex", flexDirection: "column", width:'100%', height:"100%", alignItems:"stretch", boxSizing:"border-box"}}>
+                    <Box sx={{padding: "10px", height:"10%"}}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="cs">
+                            <MobileDatePicker value={selectedDate} onChange={updateCalenderView} open={open} onOpen={()=> setOpen(true)}/>
+                        </LocalizationProvider>
+                    </Box>
+                    <Box sx={{boxSizing:"border-box", display:"flex", flexDirection:"column", alignItems:"stretch", height:"90%", maxHeight:"90%", overflowY:"auto", padding:"10px"}}>
+                        {loading?
+                            <CircularProgress/> :
+                                plan.map(workDay => <WorkDay workDay={workDay} key={workDay.date}/>
+                            )
+                        }
+                    </Box>
+                </Box>
+                :
+                <Box sx={{display:"flex", flexDirection: "row", overflow:"scroll", width:'100%', height:"100%", paddingBottom: "10px", alignItems:"stretch", boxSizing:"border-box"}}>
+                    {loading?
+                        <CircularProgress/> :
+                            plan.map(workDay => <WorkDay workDay={workDay} key={workDay.date}/>
+                        )
+                    }
+                </Box>
+            }
+
         </PageLayout>
     )
 }

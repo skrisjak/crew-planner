@@ -12,46 +12,45 @@ class API {
 
             console.log("→" + method + " " + url + (data? ("\n" + body) : ""));
 
+            const headers = {"Authorization": `Bearer ${token.trim()}`, ...(data !== null ? { "Content-Type": "application/json" } : {})};
+
+            const init = {
+                method,
+                headers,
+                ...(data !== null && { body: JSON.stringify(data) }),
+            };
             try {
-
-                const headers = {"Authorization": `Bearer ${token.trim()}`};
-
-                let init;
-                if (data !== null) {
-                    init = {
-                        method: method,
-                        headers: headers,
-                        body: body,
-                    }
-                } else {
-                    init = {
-                        method: method,
-                        headers: headers,
-                    }
-                }
-
                 const response = await fetch(url, init);
 
-                if (response.status === 403 && response.status === 401) {
+                if (response.status === 401) {
                     localStorage.removeItem("token");
-                    throw new Error("Unauthorized");
+                    window.location.href = CONF.origin + "#error=Unauthorized";
+                } else if (response.status === 404 || response.status === 403) {
+                    return null;
                 } else {
-                    const responded =  await response.json();
+                    const responded = await response.json();
                     console.log("←" + method + " " + url + "\n" + JSON.stringify(responded));
                     return responded;
                 }
-
             } catch (error) {
-                throw new Error("Network Error");
+                console.error(error);
+                window.location.href = CONF.origin + "#error=NetworkError";
             }
-
         } else {
-            throw new Error("Unauthorized");
+            window.location.href = CONF.origin + "#error=NoAuthorization";
         }
     }
 
     static getUserData = async () => {
-        return await API.doRequest("user/me");
+        return await API.doRequest("user");
+    }
+
+    static getWeekPlan = async () => {
+        return await API.doRequest("plan");
+    }
+
+    static getPlan = async (startDate, endDate) => {
+        return await API.doRequest("plan?startDate=" + startDate.format("YYYY-MM-DD") + "&endDate=" + endDate.format("YYYY-MM-DD"));
     }
 }
 
