@@ -1,9 +1,8 @@
 package cz.skrisjak.crew_planner.security;
 
 import cz.skrisjak.crew_planner.service.OAuth;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
-import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,18 +45,28 @@ public class SecurityConfiguration {
                         auth.requestMatchers(
                                 "/",
                                 "/index.html",
-                                "/static/**",
+                                "/oauth2/**",
                                 "/favicon.ico",
                                 "/manifest.json",
                                 "/logo*.png",
-                                "/asset-manifest.json"
+                                "/asset-manifest.json",
+                                "/google.svg"
                         ).permitAll()
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(user -> user.userService(oAuth))
                         .successHandler(jwtHandler)
                 )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, ex) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+                        })
+                        .accessDeniedHandler((request, response, ex) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        })
+                );
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

@@ -1,20 +1,21 @@
 package cz.skrisjak.crew_planner.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
 @Data
-public class WorkDay extends BasicEntity{
+public class WorkDay extends BasicEntity {
 
-    private Date date;
+    private LocalDate date;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     private List<WorkDayNote> notes;
 
-    @OneToMany
+    @OneToMany(mappedBy = "workDay", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShiftPlan> registeredEmployees;
 }

@@ -1,7 +1,7 @@
 package cz.skrisjak.crew_planner.rest;
 
 import cz.skrisjak.crew_planner.model.User;
-import cz.skrisjak.crew_planner.postentities.PostUser;
+import cz.skrisjak.crew_planner.data.PostUser;
 import cz.skrisjak.crew_planner.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping(path = "/me")
+    @GetMapping
     public ResponseEntity<User> me(@AuthenticationPrincipal User user) {
         User me = userService.findByEmail(user.getEmail());
         if (me == null) {
@@ -45,7 +45,7 @@ public class UserController {
     public ResponseEntity<User> updateUser(@RequestBody PostUser updateUser) {
         try {
             User update = userService.updateUser(updateUser);
-            return new ResponseEntity<>(HttpStatus.ACCEPTED);
+            return ResponseEntity.accepted().body(update);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }

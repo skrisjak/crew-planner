@@ -1,9 +1,6 @@
 package cz.skrisjak.crew_planner.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -13,6 +10,7 @@ public class ShiftPlan extends BasicEntity {
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "work_day_id")
     private WorkDay workDay;
 
     private String note;

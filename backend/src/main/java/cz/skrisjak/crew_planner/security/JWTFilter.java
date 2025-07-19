@@ -45,37 +45,21 @@ public class JWTFilter extends OncePerRequestFilter {
 
         String header = request.getHeader("Authorization");
 
-        if (header ==null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        if (header !=null && header.startsWith("Bearer ")) {
+            String token ="";
+            try {
+                token = header.substring(7);
 
-        String token = header.substring(7);
-        String userEmail;
 
-        LOG.debug("Extracting token: " + token);
-
-        try {
-            userEmail = extractUsername(token);
-        } catch (Exception e) {
-            response.sendRedirect(frontend + "#error=AuthenticationError");
-            e.printStackTrace(response.getWriter());
-            return;
-        }
-
-        LOG.debug("Extracted user: " + userEmail);
-
-        try {
-            User user = userService.authorize(userEmail);
-            if (user != null) {
-                SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user, null, getUserAuthorities(user)));
-                LOG.debug("User: " + userEmail);
-            } else {
-                throw new Exception("User not found");
+                String userEmail = extractUsername(token);
+                User user = userService.authorize(userEmail);
+                if (user != null) {
+                    LOG.info("User " + userEmail + " authorized");
+                    SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(user, null, getUserAuthorities(user)));
+                }
+            } catch (Exception ignored) {
+                LOG.warn("Invalid JWT token: {}", token);
             }
-        } catch (Exception e) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            e.printStackTrace(response.getWriter());
         }
         filterChain.doFilter(request, response);
     }

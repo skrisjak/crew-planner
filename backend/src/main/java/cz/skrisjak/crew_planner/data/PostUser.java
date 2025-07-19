@@ -1,4 +1,4 @@
-package cz.skrisjak.crew_planner.postentities;
+package cz.skrisjak.crew_planner.data;
 
 import cz.skrisjak.crew_planner.model.Role;
 import lombok.Data;
@@ -7,5 +7,6 @@ import lombok.Data;
 public class PostUser {
     private String email;
     private String name;
+    private String nickname;
     private Role role;
 }

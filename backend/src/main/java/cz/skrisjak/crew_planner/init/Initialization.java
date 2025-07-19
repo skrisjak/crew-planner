@@ -19,9 +19,11 @@ public class Initialization {
 
     @PostConstruct
     public void init() {
-        User user = new User();
-        user.setEmail("jskrisovsky06@gmail.com");
-        user.setRole(Role.ADMIN);
-        userRepository.save(user);
+        if (!userRepository.existsById("jskrisovsky06@gmail.com")) {
+            User user = new User();
+            user.setEmail("jskrisovsky06@gmail.com");
+            user.setRole(Role.ADMIN);
+            userRepository.save(user);
+        }
     }
 }

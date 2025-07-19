@@ -1,7 +1,6 @@
 package cz.skrisjak.crew_planner.service;
 
 import cz.skrisjak.crew_planner.model.User;
-import cz.skrisjak.crew_planner.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -13,11 +12,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class OAuth extends DefaultOAuth2UserService {
 
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
-    public OAuth(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public OAuth(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
@@ -26,12 +25,11 @@ public class OAuth extends DefaultOAuth2UserService {
 
         String email = oAuth2User.getAttribute("email");
 
-        User user = userRepository.findByEmail(email);
+        User user = userService.authorize(email);
 
         if (user == null) {
             throw new OAuth2AuthenticationException(new OAuth2Error("not_invited"),"User not invited");
         }
-
         return oAuth2User;
     }
 }

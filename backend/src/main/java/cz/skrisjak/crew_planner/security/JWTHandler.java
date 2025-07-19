@@ -15,6 +15,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Optional;
 
 @Component
 public class JWTHandler implements AuthenticationSuccessHandler {
@@ -43,21 +44,22 @@ public class JWTHandler implements AuthenticationSuccessHandler {
         if (principal instanceof OidcUser oidcUser) {
             email = oidcUser.getEmail();
 
-            System.out.println(oidcUser);
-            System.out.println("Picture: " +oidcUser.getPicture());
-
-            user = userRepository.findByEmail(email);
-            if (user == null) {
+            Optional<User> optionalUser = userRepository.findByEmail(email);
+            if (optionalUser.isEmpty()) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.sendRedirect(frontend + "#error=Unauthorized");
                 return;
             }
+            user = optionalUser.get();
             user.setImage(oidcUser.getPicture());
+            if (user.getName() == null) {
+                user.setName(oidcUser.getFullName());
+            }
             userRepository.save(user);
+            response.sendRedirect(frontend + "#token=" + generateToken(email));
         } else {
             throw new ServletException("Unexpected principal type: " + principal.getClass().getName());
         }
-        response.sendRedirect(frontend + "#token=" + generateToken(email));
     }
 
     public String generateToken(String email) {
