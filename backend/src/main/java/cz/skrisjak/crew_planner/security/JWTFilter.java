@@ -30,9 +30,6 @@ public class JWTFilter extends OncePerRequestFilter {
     private final JwtParser jwtParser;
     private UserService userService;
 
-    @Value("${address}")
-    private String frontend;
-
     @Autowired
     public JWTFilter(@Value("${security.jwt.secret}") String secret, UserService userService) {
         super();
