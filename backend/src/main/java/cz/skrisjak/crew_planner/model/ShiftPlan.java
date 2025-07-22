@@ -16,5 +16,6 @@ public class ShiftPlan extends BasicEntity {
     private String note;
 
     @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "varchar")
     private Availability availability;
 }
