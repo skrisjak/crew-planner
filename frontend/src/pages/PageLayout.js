@@ -8,7 +8,7 @@ import {
     IconButton, ListItemButton, Typography, MenuItem, Menu, LinearProgress,
 } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {useProfile} from "../hooks/UserProfile";
 import {useResponsive} from "../hooks/Responsive";
 import {useNavigate} from "react-router-dom";
@@ -17,9 +17,14 @@ import {useNavigate} from "react-router-dom";
 function PageLayout(props) {
     const [open, setOpen] = useState(false);
     const [anchorEl, setAnchor] = useState(null);
-    const {profile} = useProfile();
+    const loadProfile = useProfile((set)=> set.getProfile);
+    const profile = useProfile((set)=> set.profile);
     const redirect = useNavigate();
     const {mobile, width} = useResponsive();
+
+    useEffect(() => {
+        loadProfile();
+    }, [loadProfile]);
 
     return (
         <Box container sx={{backgroundColor:"#f8fafd", height:"100vh",width:"100vw",minWidth:"100vw", maxWidth:"100vw", minHeight:"100vh", maxHeight:"100vh"}}>

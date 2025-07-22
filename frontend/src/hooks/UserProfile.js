@@ -1,22 +1,16 @@
-import { useState, useEffect } from "react";
 import API from "../api/API";
-import {useNavigate} from "react-router-dom";
+import {create} from "zustand/react";
+import CONF from "../api/CONF";
 
-export const useProfile = () => {
-    const [profile, setProfile] = useState(null);
-    const redirect = useNavigate();
-
-    useEffect(() => {
-        const getProfile = async () => {
+export const useProfile = create( (set)  => ({
+    profile:null,
+    getProfile: async () => {
             try {
                 const newProfile = await API.getUserData();
-                setProfile(newProfile);
+                set({profile:newProfile});
             } catch (err) {
-                redirect("/");
+                window.location.href = CONF.origin;
             }
-        };
-        getProfile();
-    }, []);
-
-    return {profile};
-};
+        }
+    })
+);

@@ -26,11 +26,16 @@ class API {
                 localStorage.removeItem("token");
                 throw new Error("Unauthorized");
             } else if (response.status === 404 || response.status === 403) {
-                throw new Error("Unauthorized");
+                throw new Error("Not found");
             } else {
-                const responded = await response.json();
-                console.log("←" + method + " " + url + "\n" + JSON.stringify(responded));
-                return responded;
+
+                if (response.ok && ["POST", "GET"].includes(method)) {
+                    const responded = await response.json();
+                    console.log("←" + method + " " + url + "\n" + JSON.stringify(responded));
+                    return responded;
+                } else if (response.ok){
+                    console.log("←" + method + " " + url + " OK");
+                }
             }
         }
     }
@@ -39,12 +44,40 @@ class API {
         return await API.doRequest("user");
     }
 
+    static getUsers = async () => {
+        return await API.doRequest("user/all");
+    }
+
     static getWeekPlan = async () => {
         return await API.doRequest("plan");
     }
 
     static getPlan = async (startDate, endDate) => {
         return await API.doRequest("plan?startDate=" + startDate.format("YYYY-MM-DD") + "&endDate=" + endDate.format("YYYY-MM-DD"));
+    }
+
+    static postNote = async (note) => {
+        return await API.doRequest("plan/note", "POST", note);
+    }
+
+    static updateNote = async (note) => {
+        return await API.doRequest("plan/note", "PUT", note);
+    }
+
+    static deleteNote = async (id) => {
+        return await API.doRequest("plan/note?noteId=" + id,"DELETE");
+    }
+
+    static addWorker = async (worker) => {
+        return await API.doRequest("plan/worker", "POST", worker);
+    }
+
+    static updateWorker = async (worker) => {
+        return await API.doRequest("plan/worker", "PUT", worker);
+    }
+
+    static deleteWorker = async (workerId) => {
+        return await API.doRequest("plan/worker?planId=" + workerId, "DELETE");
     }
 }
 

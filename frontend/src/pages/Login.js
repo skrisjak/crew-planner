@@ -25,8 +25,8 @@ function Login() {
         }
     }, [location, navigate]);
     return (
-      <Box sx={{width:"100vw",height:"100vh",alignItems: 'center', display: 'flex', flexDirection:'column', justifyContent: 'space-evenly', boxSizing:"border-box"}}>
-          <Box sx={{padding:"10px", display:"flex", flexDirection:"column", justifyContent:"space-between", alignItems:"center", boxSizing:"border-box"}}>
+      <Box sx={{height:"100vh",width:"100vw",minWidth:"100vw", maxWidth:"100vw", minHeight:"100vh", maxHeight:"100vh", alignItems: 'center', display: 'flex', flexDirection:'column', justifyContent: 'space-evenly', boxSizing:"border-box", overflow:"hidden", padding:2}}>
+          <Box sx={{display:"flex", flexDirection:"column", justifyContent:"space-between", alignItems:"center", boxSizing:"border-box", overflow:"hidden"}}>
               <Typography variant="h4" fontFamily="Nova Mono" sx={{marginBottom:"15px"}}>
                   <span className="material-symbols-outlined">calendar_month</span>
                   ShiftBoard
