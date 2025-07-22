@@ -10,11 +10,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/user")
 @PreAuthorize("isAuthenticated()")
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
 
     @Autowired
     public UserController(UserService userService) {
@@ -23,16 +25,16 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<User> me(@AuthenticationPrincipal User user) {
-        User me = userService.findByEmail(user.getEmail());
-        if (me == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
-        } else {
+        try {
+            User me = userService.findByEmail(user.getEmail());
             return new ResponseEntity<>(me, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole(ADMIN, MANAGER)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<User> createUser(@RequestBody PostUser newUser) {
         if (newUser == null) {
             return ResponseEntity.badRequest().body(null);
@@ -42,7 +44,7 @@ public class UserController {
     }
 
     @PutMapping
-    @PreAuthorize("hasAnyRole(ADMIN, MANAGER)")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public ResponseEntity<User> updateUser(@RequestBody PostUser updateUser) {
         try {
             User update = userService.updateUser(updateUser);
@@ -50,5 +52,11 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }
+    }
+
+    @GetMapping(path = "/all")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    public ResponseEntity<List<User>> getAllUsers() {
+       return ResponseEntity.ok(userService.getWorkingUsers());
     }
 }

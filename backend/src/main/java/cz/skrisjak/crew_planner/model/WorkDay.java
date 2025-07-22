@@ -13,7 +13,7 @@ public class WorkDay extends BasicEntity {
 
     private LocalDate date;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "workDay", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<WorkDayNote> notes;
 
     @OneToMany(mappedBy = "workDay", cascade = CascadeType.ALL, orphanRemoval = true)

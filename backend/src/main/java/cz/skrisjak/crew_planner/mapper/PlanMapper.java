@@ -1,10 +1,13 @@
 package cz.skrisjak.crew_planner.mapper;
 
 import cz.skrisjak.crew_planner.data.Plan;
+import cz.skrisjak.crew_planner.data.ResponseNote;
 import cz.skrisjak.crew_planner.data.ResponseShiftPlan;
 import cz.skrisjak.crew_planner.data.WorkDayPlan;
 import cz.skrisjak.crew_planner.model.ShiftPlan;
 import cz.skrisjak.crew_planner.model.WorkDay;
+import cz.skrisjak.crew_planner.model.WorkDayNote;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +36,7 @@ public class PlanMapper {
         LocalDate date = workDay.getDate();
         WorkDayPlan dayPlan = new WorkDayPlan();
         dayPlan.setDate(date);
-        dayPlan.setNotes(workDay.getNotes());
+        dayPlan.setNotes(workDay.getNotes().stream().map(PlanMapper::mapNote).toList());
         dayPlan.setId(workDay.getId());
         dayPlan.setRegisteredWorkers(mapPlans(workDay.getRegisteredEmployees()));
         return dayPlan;
@@ -56,5 +59,14 @@ public class PlanMapper {
         rsp.setNote(shiftPlan.getNote());
         rsp.setAvailability(shiftPlan.getAvailability());
         return rsp;
+    }
+
+    public static ResponseNote mapNote(WorkDayNote note) {
+        ResponseNote rn = new ResponseNote();
+        rn.setLabel(note.getLabel());
+        rn.setDescription(note.getDescription());
+        rn.setId(note.getId());
+        rn.setWorkDayId(note.getWorkDay().getId());
+        return rn;
     }
 }

@@ -1,19 +1,21 @@
 package cz.skrisjak.crew_planner.service;
 
+import cz.skrisjak.crew_planner.model.Role;
 import cz.skrisjak.crew_planner.model.User;
 import cz.skrisjak.crew_planner.data.PostUser;
 import cz.skrisjak.crew_planner.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 
 @Service
 public class UserService {
 
-    private ConcurrentHashMap<String,User> loggedInUsers = new ConcurrentHashMap<>();
-    private UserRepository userRepository;
+    private final ConcurrentHashMap<String,User> loggedInUsers = new ConcurrentHashMap<>();
+    private final UserRepository userRepository;
 
     @Autowired
     public UserService(UserRepository userRepository) {
@@ -25,11 +27,13 @@ public class UserService {
             return loggedInUsers.get(email);
         }
         User user = userRepository.findByEmail(email).orElse(null);
-        loggedInUsers.put(email, user);
+        if (user != null) {
+            loggedInUsers.put(email, user);
+        }
         return user;
     }
 
-    public User updateUser(PostUser updateUser) throws Exception {
+    public User updateUser(PostUser updateUser) {
         User user = userRepository.findByEmail(updateUser.getEmail()).orElseThrow();
         user.setName(updateUser.getName());
         user.setEmail(updateUser.getEmail());
@@ -48,6 +52,15 @@ public class UserService {
     }
 
     public User findByEmail(String email) {
-        return userRepository.findByEmail(email).orElse(null);
+        return userRepository.findByEmail(email).orElseThrow();
+    }
+
+    public List<User> getWorkingUsers() {
+        return userRepository
+                .findAll()
+                .stream()
+                .filter(u ->
+                        (u.getRole().equals(Role.ADMIN )|| u.getRole().equals(Role.EMPLOYEE)))
+                .collect(Collectors.toList());
     }
 }

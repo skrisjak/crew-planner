@@ -2,7 +2,6 @@ package cz.skrisjak.crew_planner.service;
 
 import cz.skrisjak.crew_planner.data.PostNote;
 import cz.skrisjak.crew_planner.data.PostShiftPlan;
-import cz.skrisjak.crew_planner.data.ResponseShiftPlan;
 import cz.skrisjak.crew_planner.model.ShiftPlan;
 import cz.skrisjak.crew_planner.model.User;
 import cz.skrisjak.crew_planner.model.WorkDay;
@@ -11,8 +10,8 @@ import cz.skrisjak.crew_planner.repository.ShiftPlanRepository;
 import cz.skrisjak.crew_planner.repository.UserRepository;
 import cz.skrisjak.crew_planner.repository.WorkDayNoteRepository;
 import cz.skrisjak.crew_planner.repository.WorkDayRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -20,6 +19,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,7 +31,7 @@ public class PlanningService {
     private final ShiftPlanRepository shiftPlanRepository;
 
     @Autowired
-    private PlanningService(WorkDayRepository repository, WorkDayNoteRepository noteRepository, ShiftPlanRepository shiftPlanRepository, UserRepository userRepository) {
+    public PlanningService(WorkDayRepository repository, WorkDayNoteRepository noteRepository, ShiftPlanRepository shiftPlanRepository, UserRepository userRepository) {
         this.repository = repository;
         this.noteRepository = noteRepository;
         this.shiftPlanRepository = shiftPlanRepository;
@@ -76,21 +76,21 @@ public class PlanningService {
         WorkDayNote workDayNote = new WorkDayNote();
         workDayNote.setLabel(note.getLabel());
         workDayNote.setDescription(note.getDescription());
+        workDayNote.setWorkDay(workDay);
         workDay.getNotes().add(workDayNote);
-        repository.save(workDay);
-        return workDayNote;
+        return noteRepository.save(workDayNote);
     }
 
     public void updateNote(PostNote updatedNote) {
-        noteRepository.findById(updatedNote.getId()).ifPresent(note -> {
-            note.setLabel(updatedNote.getLabel());
-            note.setDescription(updatedNote.getDescription());
-            noteRepository.save(note);
-        });
+        WorkDayNote note = noteRepository.findById(updatedNote.getId()).orElseThrow();
+        note.setLabel(updatedNote.getLabel());
+        note.setDescription(updatedNote.getDescription());
+        noteRepository.save(note);
     }
 
     public void removeNote(Long id) {
         WorkDayNote note = noteRepository.findById(id).orElseThrow();
+        note.getWorkDay().getNotes().remove(note);
         noteRepository.delete(note);
     }
 
@@ -108,19 +108,24 @@ public class PlanningService {
     }
 
     public void updateUserToWorkDay(PostShiftPlan shiftPlan) {
-        repository.findById(shiftPlan.getWorkDayId()).ifPresent(workDay -> {
-            workDay.getRegisteredEmployees().stream().filter(sp -> {
-                return sp.getUser().getEmail().equals(shiftPlan.getUserEmail());
-            }).findFirst().ifPresent(sp -> {
-                sp.setAvailability(shiftPlan.getAvailability());
-                sp.setNote(shiftPlan.getNote());
-                shiftPlanRepository.save(sp);
+        System.out.println(shiftPlan);
+        WorkDay workDay = repository.findById(shiftPlan.getWorkDayId()).orElseThrow();
+        workDay.getRegisteredEmployees()
+                .stream()
+                .filter(sp -> {
+                    return sp.getId().equals(shiftPlan.getId());
+                })
+                .findFirst()
+                .ifPresent(sp -> {
+                    sp.setAvailability(shiftPlan.getAvailability());
+                    sp.setNote(shiftPlan.getNote());
+                    shiftPlanRepository.save(sp);
             });
-        });
     }
 
     public void removeUserFromWorkDay(Long planId) {
-        shiftPlanRepository.findById(planId).ifPresent(shiftPlanRepository::delete);
+        ShiftPlan plan =shiftPlanRepository.findById(planId).orElseThrow();
+        shiftPlanRepository.delete(plan);
     }
 
     private List<WorkDay> findByDate(LocalDate date) {

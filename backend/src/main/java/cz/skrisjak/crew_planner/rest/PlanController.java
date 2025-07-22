@@ -1,9 +1,6 @@
 package cz.skrisjak.crew_planner.rest;
 
-import cz.skrisjak.crew_planner.data.Plan;
-import cz.skrisjak.crew_planner.data.PostNote;
-import cz.skrisjak.crew_planner.data.PostShiftPlan;
-import cz.skrisjak.crew_planner.data.ResponseShiftPlan;
+import cz.skrisjak.crew_planner.data.*;
 import cz.skrisjak.crew_planner.mapper.PlanMapper;
 import cz.skrisjak.crew_planner.model.ShiftPlan;
 import cz.skrisjak.crew_planner.model.WorkDay;
@@ -34,7 +31,6 @@ public class PlanController {
     public ResponseEntity<Plan> getShiftPlan() {
         List<WorkDay> workDays = planningService.getWeekPlan();
         Plan plan = PlanMapper.map(workDays);
-        System.out.println(plan);
         return ResponseEntity.ok(plan);
     }
 
@@ -57,20 +53,49 @@ public class PlanController {
     }
 
     @PutMapping(path = "/worker")
-    public ResponseEntity<ResponseShiftPlan> updatePlan(@RequestBody PostShiftPlan plan) {
+    public ResponseEntity<Void> updatePlan(@RequestBody PostShiftPlan plan) {
         try {
-            ShiftPlan sp = planningService.addUserToWorkDay(plan);
-            ResponseShiftPlan rsp =PlanMapper.mapPlan(sp);
-            return ResponseEntity.ok(rsp);
+            planningService.updateUserToWorkDay(plan);
+            return ResponseEntity.accepted().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping(path = "/worker")
+    public ResponseEntity<Void> removeWorkerFromWorkDay(@RequestParam(name="planId") Long planId) {
+        try {
+            planningService.removeUserFromWorkDay(planId);
+            return ResponseEntity.accepted().build();
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @PostMapping(path = "/note")
-    public ResponseEntity<WorkDayNote> updatePlan(@RequestBody PostNote note) {
+    public ResponseEntity<ResponseNote> postNote(@RequestBody PostNote note) {
         try {
-            return ResponseEntity.ok(planningService.addNote(note));
+            return ResponseEntity.ok(PlanMapper.mapNote(planningService.addNote(note)));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping(path = "/note")
+    public ResponseEntity<Void> updateNote(@RequestBody PostNote note) {
+        try {
+            planningService.updateNote(note);
+            return ResponseEntity.accepted().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping(path = "/note")
+    public ResponseEntity<Void> deleteNote(@RequestParam(name="noteId") Long noteId) {
+        try {
+            planningService.removeNote(noteId);
+            return ResponseEntity.accepted().build();
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }

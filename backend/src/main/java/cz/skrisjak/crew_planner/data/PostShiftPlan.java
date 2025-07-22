@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class PostShiftPlan {
+    private Long id;
     private String userEmail;
     private Long workDayId;
     private String note;

@@ -47,7 +47,6 @@ public class JWTFilter extends OncePerRequestFilter {
             try {
                 token = header.substring(7);
 
-
                 String userEmail = extractUsername(token);
                 User user = userService.authorize(userEmail);
                 if (user != null) {
