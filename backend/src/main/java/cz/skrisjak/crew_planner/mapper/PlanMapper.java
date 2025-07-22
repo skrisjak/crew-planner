@@ -36,7 +36,9 @@ public class PlanMapper {
         LocalDate date = workDay.getDate();
         WorkDayPlan dayPlan = new WorkDayPlan();
         dayPlan.setDate(date);
-        dayPlan.setNotes(workDay.getNotes().stream().map(PlanMapper::mapNote).toList());
+        if (workDay.getNotes() != null) {
+            dayPlan.setNotes(workDay.getNotes().stream().map(PlanMapper::mapNote).toList());
+        }
         dayPlan.setId(workDay.getId());
         dayPlan.setRegisteredWorkers(mapPlans(workDay.getRegisteredEmployees()));
         return dayPlan;
