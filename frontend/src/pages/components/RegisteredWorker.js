@@ -65,7 +65,7 @@ const RegisteredWorker =(props) => {
     return (
         <>
             <Tooltip title={<Box maxWidth="20vw">{registeredWorker.note}</Box>} open={toolTipOpen} onOpen={e=> hasNote && setToolTipOpen(true)} onClose={e => setToolTipOpen(false)} onClick={openDialog}>
-                <Chip avatar={<Avatar src={registeredWorker.image} />} variant="filled" label={registeredWorker.user } icon={getIcon(registeredWorker.availability)} sx={{margin:"5px", ":hover":{scale:1.02}, backgroundColor:getColor(registeredWorker.availability)}}/>
+                <Chip avatar={<Avatar src={registeredWorker.image} />} variant="filled" label={registeredWorker.user } icon={getIcon(registeredWorker.availability)} sx={{margin:"5px", ":hover":{scale:1.02}}}/>
             </Tooltip>
             <Dialog open={dialogOpen} onClose={e => {setDialogOpen(false); e.stopPropagation();}} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "80vw" : "50vw",minHeight: "50vh", maxHeight:"90vh", padding:"10px", boxSizing:"border-box", overflowY:"auto"}}} onClick={e => e.stopPropagation()}>
                 <RegisterShift updatable access={updatable} registeredWorker={registeredWorker} addWorker={addWorker} deleteWorker={props.deleteWorker}/>
