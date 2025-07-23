@@ -3,16 +3,18 @@ import {useState} from "react";
 import {useProfile} from "../../hooks/UserProfile";
 import RegisterShift from "./RegisterShift";
 import {useResponsive} from "../../hooks/Responsive";
-import API from "../../api/API";
+import AccessibilityIcon from '@mui/icons-material/Accessibility';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 function getColor(availability) {
     switch (availability) {
         case "WORKING":
-            return "green";
+            return <CheckCircleIcon sx={{color: "green"}}/>
         case "AVAILABLE":
-            return "darkgray";
+            return <AccessibilityIcon sx={{color: "yellow"}}/>
         default:
-            return "red";
+            return <CancelIcon sx={{color: "red"}}/>
     }
 }
 
@@ -23,6 +25,7 @@ const RegisteredWorker =(props) => {
     const [toolTipOpen, setToolTipOpen] = useState(false);
     const [dialogOpen, setDialogOpen] = useState(false);
     const {mobile} = useResponsive();
+    const [updatable, setUpdatable] = useState(false);
 
     const openDialog = (e) => {
         e.stopPropagation();
@@ -42,11 +45,11 @@ const RegisteredWorker =(props) => {
                 canAccess = true;
             }
         }
-        if (canAccess) {
-            setDialogOpen(true);
-        }
-
+        setUpdatable(canAccess);
+        setDialogOpen(true);
     }
+
+
 
     const addWorker = async (newWorker, updatable) => {
         try {
@@ -62,10 +65,10 @@ const RegisteredWorker =(props) => {
     return (
         <>
             <Tooltip title={<Box maxWidth="20vw">{registeredWorker.note}</Box>} open={toolTipOpen} onOpen={e=> hasNote && setToolTipOpen(true)} onClose={e => setToolTipOpen(false)} onClick={openDialog}>
-                <Chip avatar={<Avatar src={registeredWorker.image} />} variant="filled" label={registeredWorker.user} sx={{margin:"5px", ":hover":{scale:1.02}}} color={getColor(registeredWorker.availability)}/>
+                <Chip avatar={<Avatar src={registeredWorker.image} />} variant="filled" label={registeredWorker.user + " " + getColor(registeredWorker.availability)} sx={{margin:"5px", ":hover":{scale:1.02}, backgroundColor:getColor(registeredWorker.availability)}}/>
             </Tooltip>
             <Dialog open={dialogOpen} onClose={e => {setDialogOpen(false); e.stopPropagation();}} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "80vw" : "50vw",minHeight: "50vh", maxHeight:"90vh", padding:"10px", boxSizing:"border-box", overflowY:"auto"}}} onClick={e => e.stopPropagation()}>
-                <RegisterShift updatable registeredWorker={registeredWorker} addWorker={addWorker} deleteWorker={props.deleteWorker}/>
+                <RegisterShift updatable access={updatable} registeredWorker={registeredWorker} addWorker={addWorker} deleteWorker={props.deleteWorker}/>
             </Dialog>
         </>
     )

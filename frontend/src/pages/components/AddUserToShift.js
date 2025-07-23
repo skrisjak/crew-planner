@@ -32,7 +32,7 @@ const AddUserToShift = (props) => {
                 Přidat zaměstnance
             </Typography>
             <Autocomplete sx={{width: mobile? "100%": "68%"}}
-                options={users}
+                options={users.filter(u=> u.role !== "MANAGER")}
                 getOptionLabel={(option) => option.name}
                 getOptionKey={option => option.email}
                 value={selectedUser}

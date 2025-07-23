@@ -12,6 +12,7 @@ const RegisterShift =(props) => {
     const [note, setNote] = useState(registeredWorker? registeredWorker.note : "");
     const profile = useProfile(st => st.profile);
     const updatable = props.updatable? props.updatable : false;
+    const accessible = props.access? props.access : false;
     const [postLoading, setPostLoading] = useState(false);
     const [deleteLoading, setDeleteLoading] = useState(false);
 
@@ -64,6 +65,7 @@ const RegisterShift =(props) => {
                 <MenuItem value="UNAVAILABLE">Nemůžu</MenuItem>
             </Select>
             <TextField label="Poznámka" value={note} onChange={(e) => setNote(e.target.value)} variant="standard"/>
+            {accessible && (
             <Box sx={{display:"flex", flexDirection:"row-reverse", width:mobile? '100%': "96%"}}>
                 <Button onClick={addWorker} variant="contained" loading={postLoading}>
                     {updatable? "Upravit": "Zapsat"}
@@ -73,7 +75,8 @@ const RegisterShift =(props) => {
                         Smazat
                     </Button>
                 )}
-        </Box>
+            </Box>
+            )}
     </Box>
     )
 }

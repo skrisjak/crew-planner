@@ -44,6 +44,18 @@ class API {
         return await API.doRequest("user");
     }
 
+    static addUser = async (userData) => {
+        return await API.doRequest("user", "POST",userData);
+    }
+
+    static updateUser = async (userData) => {
+        return await API.doRequest("user", "PUT", userData);
+    }
+
+    static deleteUser = async (userEmail) => {
+        return await API.doRequest("user?userEmail="+userEmail, "DELETE");
+    }
+
     static getUsers = async () => {
         return await API.doRequest("user/all");
     }

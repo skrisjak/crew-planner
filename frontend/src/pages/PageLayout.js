@@ -59,16 +59,27 @@ function PageLayout(props) {
                     <SwipeableDrawer open={open} onClose={() => setOpen(false)} onOpen={()=>setOpen(true)}>
                         <Box sx={{width: width/2}}>
                         <List>
-                            <ListItem key="plan" sx={{padding:0, margin:0}}>
+                            <ListItem key="home" sx={{padding:0, margin:0}} onClick={()=> redirect("/home")}>
                                 <ListItemButton>
                                     <ListItemText>Plán směn</ListItemText>
                                 </ListItemButton>
                             </ListItem>
-                            <ListItem key="shift" sx={{padding:0, margin:0}}>
+                            <ListItem key="hours" sx={{padding:0, margin:0}} onClick={()=> redirect("/hours")}>
                                 <ListItemButton>
                                     <ListItemText>Hodiny</ListItemText>
                                 </ListItemButton>
                             </ListItem>
+
+                            {
+                                profile && ["ADMIN", "MANAGER"].includes(profile.role) && (
+                                    <ListItem key="users" sx={{padding:0, margin:0}} onClick={()=> redirect("/users")}>
+                                        <ListItemButton>
+                                            <ListItemText>Uživatelé</ListItemText>
+                                        </ListItemButton>
+                                    </ListItem>
+                                )
+                            }
+
                         </List>
                         </Box>
                     </SwipeableDrawer>
@@ -78,16 +89,26 @@ function PageLayout(props) {
                 <Box container sx={{display:"flex", flexDirection:"row", justifyContent:"space-evenly",boxSizing:"border-box", minHeight:"90vh", maxHeight:"90vh",}}>
                     <Box container sx={{height:"100%", minWidth:"15%", maxWidth:"15%"}}>
                         <List>
-                            <ListItem key="plan" sx={{padding:0, margin:0}}>
+                            <ListItem key="home" sx={{padding:0, margin:0}} onClick={()=> redirect("/home")}>
                                 <ListItemButton>
                                     <ListItemText>Plán směn</ListItemText>
                                 </ListItemButton>
                             </ListItem>
-                            <ListItem key="hey" sx={{padding:0, margin:0}}>
+                            <ListItem key="hours" sx={{padding:0, margin:0}} onClick={()=> redirect("/hours")}>
                                 <ListItemButton>
                                     <ListItemText>Hodiny</ListItemText>
                                 </ListItemButton>
                             </ListItem>
+
+                            {
+                                profile && ["ADMIN", "MANAGER"].includes(profile.role) && (
+                                    <ListItem key="users" sx={{padding:0, margin:0}} onClick={()=> redirect("/users")}>
+                                        <ListItemButton>
+                                            <ListItemText>Uživatelé</ListItemText>
+                                        </ListItemButton>
+                                    </ListItem>
+                                )
+                            }
                         </List>
                         {(!mobile && props.calendar) && props.calendar}
                     </Box>

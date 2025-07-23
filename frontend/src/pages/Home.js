@@ -6,7 +6,7 @@ import "dayjs/locale/cs";
 import dayjs from "dayjs";
 import {useResponsive} from "../hooks/Responsive";
 import {usePlan} from "../hooks/Plan";
-import {Box, CircularProgress, Divider} from "@mui/material";
+import {Box, CircularProgress} from "@mui/material";
 import WorkDay from "./components/WorkDay";
 
 function Home() {
