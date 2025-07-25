@@ -94,10 +94,12 @@ public class PlanningService {
         noteRepository.delete(note);
     }
 
-    public ShiftPlan addUserToWorkDay(PostShiftPlan shiftPlan) {
+    public ShiftPlan addUserToWorkDay(PostShiftPlan shiftPlan) throws Exception {
         User user = userRepository.findByEmail(shiftPlan.getUserEmail()).orElseThrow();
         WorkDay workDay = repository.findById(shiftPlan.getWorkDayId()).orElseThrow();
-
+        if (workDay.getRegisteredEmployees().stream().anyMatch(shiftPlan1 -> shiftPlan1.getUser().equals(user))) {
+            throw new Exception("Already exists");
+        }
         ShiftPlan plan = new ShiftPlan();
         plan.setUser(user);
         plan.setWorkDay(workDay);
@@ -108,7 +110,6 @@ public class PlanningService {
     }
 
     public void updateUserToWorkDay(PostShiftPlan shiftPlan) {
-        System.out.println(shiftPlan);
         WorkDay workDay = repository.findById(shiftPlan.getWorkDayId()).orElseThrow();
         workDay.getRegisteredEmployees()
                 .stream()

@@ -4,9 +4,10 @@ import cz.skrisjak.crew_planner.model.Role;
 import lombok.Data;
 
 @Data
-public class PostUser {
+public class ResponseUser {
     private String email;
     private String name;
     private String nickName;
+    private String image;
     private Role role;
 }

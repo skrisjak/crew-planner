@@ -2,11 +2,13 @@ package cz.skrisjak.crew_planner.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 @Entity
 @Data
 public class ShiftPlan extends BasicEntity {
     @ManyToOne
+    @JoinColumn(name = "user_email", referencedColumnName = "email", nullable = false)
     private User user;
 
     @ManyToOne

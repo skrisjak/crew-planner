@@ -4,10 +4,10 @@ import cz.skrisjak.crew_planner.data.*;
 import cz.skrisjak.crew_planner.mapper.PlanMapper;
 import cz.skrisjak.crew_planner.model.ShiftPlan;
 import cz.skrisjak.crew_planner.model.WorkDay;
-import cz.skrisjak.crew_planner.model.WorkDayNote;
 import cz.skrisjak.crew_planner.service.PlanningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -49,6 +49,8 @@ public class PlanController {
             return ResponseEntity.ok(rsp);
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 

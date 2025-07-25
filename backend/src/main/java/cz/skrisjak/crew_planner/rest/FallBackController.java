@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class FallBackController {
 
-    @GetMapping({"/home/**", "/profile/**", "/dashboard/**", "/about/**"})
+    @GetMapping({"/home/**", "/users/**", "/hours/**"})
     public String fallback() {
         return "forward:/index.html";
     }

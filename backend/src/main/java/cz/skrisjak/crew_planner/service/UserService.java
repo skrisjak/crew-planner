@@ -1,6 +1,5 @@
 package cz.skrisjak.crew_planner.service;
 
-import cz.skrisjak.crew_planner.model.Role;
 import cz.skrisjak.crew_planner.model.User;
 import cz.skrisjak.crew_planner.data.PostUser;
 import cz.skrisjak.crew_planner.repository.UserRepository;
@@ -8,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-
 
 @Service
 public class UserService {
@@ -37,7 +34,7 @@ public class UserService {
         User user = userRepository.findByEmail(updateUser.getEmail()).orElseThrow();
         user.setName(updateUser.getName());
         user.setEmail(updateUser.getEmail());
-        user.setNickName(updateUser.getNickname());
+        user.setNickName(updateUser.getNickName());
         user.setRole(updateUser.getRole());
         return userRepository.save(user);
     }
@@ -46,9 +43,14 @@ public class UserService {
         User user = new User();
         user.setEmail(newUser.getEmail());
         user.setName(newUser.getName());
-        user.setNickName(newUser.getNickname());
+        user.setNickName(newUser.getNickName());
         user.setRole(newUser.getRole());
         return userRepository.save(user);
+    }
+
+    public void deleteUser(String email) {
+        User u = userRepository.findByEmail(email).orElseThrow();
+        userRepository.delete(u);
     }
 
     public User findByEmail(String email) {
@@ -56,11 +58,6 @@ public class UserService {
     }
 
     public List<User> getWorkingUsers() {
-        return userRepository
-                .findAll()
-                .stream()
-                .filter(u ->
-                        (u.getRole().equals(Role.ADMIN )|| u.getRole().equals(Role.EMPLOYEE)))
-                .collect(Collectors.toList());
+        return userRepository.findAll();
     }
 }
