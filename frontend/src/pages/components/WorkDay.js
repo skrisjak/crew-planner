@@ -78,7 +78,7 @@ export default function WorkDay (props) {
     return (
         <>
             <Paper id={dayjs(workDay.date).format("YYYY-MM-DD")}
-                   sx={{minWidth: mobile? undefined : "30%", minHeight: mobile? "30%" : undefined, padding: "5px", marginRight: mobile ? undefined : "10px", marginBottom: mobile ? "10px" : undefined, cursor: "pointer", transition: "0.3s", "&:hover": {scale:1.01}, display:"inline", alignItems:"start"}}
+                   sx={{ boxSizing:"border-box",minWidth: mobile? undefined : "30%", minHeight: mobile? "30%" : undefined,maxHeight:"100%", padding: "5px", marginRight: mobile ? undefined : "10px", marginBottom: mobile ? "10px" : undefined, cursor: "pointer", transition: "0.3s", "&:hover": {scale:1.01}, display:"flex", flexDirection:"row", flexWrap:"wrap", gap:2, alignItems:"flex-start", alignContent:"flex-start"}}
                    onClick={()=> {setActionDialogOpen(true)}}
             >
                 <Typography sx={{marginBottom:"10px", width:"100%"}}>{getDateText(workDay.date)}</Typography>
@@ -103,7 +103,7 @@ export default function WorkDay (props) {
                     <AddNote addNote={addNote}/>
                 )}
                 {profile && ["ADMIN", "EMPLOYEE"].includes(profile.role) && (
-                    <RegisterShift addWorker={addWorker}/>
+                    <RegisterShift access addWorker={addWorker}/>
                 )}
 
                 {profile && ["ADMIN", "MANAGER"].includes(profile.role) && (

@@ -4,6 +4,7 @@ import {useResponsive} from "../hooks/Responsive";
 import {useUsers} from "../hooks/Users";
 import {useEffect, useState} from "react";
 import AddIcon from '@mui/icons-material/Add';
+import API from "../api/API";
 
 const ADD_USER="Přidat uživatele"
 
@@ -17,10 +18,13 @@ const Users = () => {
     const [nickName, setNickName] = useState("");
     const [role, setRole] = useState("EMPLOYEE");
 
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         if (users === null || users.length === 0) {
             setUsers();
         }
+        // eslint-disable-next-line
     }, [setUsers]);
 
     useEffect(() => {
@@ -33,11 +37,11 @@ const Users = () => {
             setEmail(selectedUser.email);
             setNickName(selectedUser.nickName || "");
             setRole(selectedUser.role);
-            setName(selectedUser.name);
+            setName(selectedUser.name || "");
         }
     }, [selectedUser]);
 
-    const addUser = () => {
+    const addUser = async () => {
         try {
             const newUser = {
                 email: email,
@@ -46,10 +50,45 @@ const Users = () => {
                 role: role,
             }
 
+            setLoading(true);
+            const rsp = await API.addUser(newUser);
+            users.push(rsp);
+            setSelectedUser(rsp);
         } catch (error) {
-
+            alert(error);
         } finally {
+            setLoading(false);
+        }
+    }
 
+    const updateUser = async () => {
+        try {
+            const updateUser = {
+                email: email,
+                name: name,
+                nickName: nickName,
+                role: role,
+            }
+
+            setLoading(true);
+            await API.updateUser(updateUser);
+
+        } catch (error) {
+            alert(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const deleteUser = async () => {
+        try {
+            setLoading(true);
+            await API.deleteUser(selectedUser.email);
+            setSelectedUser(null);
+        } catch (error) {
+            alert(error)
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -104,15 +143,15 @@ const Users = () => {
                             <Box display="flex" flexDirection="row-reverse" gap={2}>
 
                                 {selectedUser===ADD_USER? (
-                                        <Button variant="contained">
+                                        <Button variant="contained" loading={loading} onClick={addUser}>
                                         Přidat
                                         </Button>
                                     ) : (
                                         <>
-                                            <Button variant="contained">
+                                            <Button variant="contained" loading={loading} onClick={updateUser}>
                                             Upravit
                                             </Button>
-                                            <Button variant="outlined">
+                                            <Button variant="outlined" loading={loading} onClick={deleteUser}>
                                             Smazat
                                             </Button>
                                         </>

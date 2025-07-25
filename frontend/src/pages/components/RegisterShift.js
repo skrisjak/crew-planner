@@ -66,7 +66,7 @@ const RegisterShift =(props) => {
             </Select>
             <TextField label="Poznámka" value={note} onChange={(e) => setNote(e.target.value)} variant="standard"/>
             {accessible && (
-            <Box sx={{display:"flex", flexDirection:"row-reverse", width:mobile? '100%': "96%"}}>
+            <Box sx={{display:"flex", flexDirection:"row-reverse", width:mobile? '100%': "96%", gap:2}}>
                 <Button onClick={addWorker} variant="contained" loading={postLoading}>
                     {updatable? "Upravit": "Zapsat"}
                 </Button>

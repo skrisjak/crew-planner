@@ -60,7 +60,7 @@ const WorkDayNote = (props) => {
 
     return (
         <>
-            <Paper onClick={(e)=> {e.stopPropagation(); toggle()}} sx={{":hover": {scale:1.01, backgroundColor:"lightgrey",}, display:"flex", flexDirection:"column", width:"100%", height:"auto", padding:"5px", boxSizing:"border-box"}}>
+            <Paper onClick={(e)=> {e.stopPropagation(); toggle()}} sx={{":hover": {scale:1.01, backgroundColor:"lightgrey",}, display:"flex", flexDirection:"column", width:"100%", padding:"5px", boxSizing:"border-box"}}>
                 <Box sx={{display:"flex", justifyContent:"space-between", flexDirection:"row", width:"100%", borderRadius:"5px", alignItems:"center"}}>
                     <Box sx={{alignItems:"center", display:"inline-flex", justifyContent:"space-between"}}>
                         <Typography sx={{fontWeight:500}}>

@@ -40,7 +40,7 @@ function Home() {
                             <MobileDatePicker value={selectedDate} onChange={updateCalenderView} open={open} onOpen={()=> setOpen(true)}/>
                         </LocalizationProvider>
                     </Box>
-                    <Box sx={{boxSizing:"border-box", display:"flex", flexDirection:"column", alignItems:"stretch", height:"90%", maxHeight:"90%", overflowY:"auto", padding:"10px"}}>
+                    <Box sx={{boxSizing:"border-box", display:"block", flexDirection:"column", alignItems:"stretch", alignContent:"flex-start", height:"90%", overflow:"auto", padding:"10px"}}>
                         {loading?
                             <CircularProgress/> :
                                 plan.map(workDay => <WorkDay workDay={workDay} key={workDay.date}/>

@@ -29,7 +29,7 @@ function Login() {
           <Box sx={{display:"flex", flexDirection:"column", justifyContent:"space-between", alignItems:"center", boxSizing:"border-box", overflow:"hidden"}}>
               <Typography variant="h4" fontFamily="Nova Mono" sx={{marginBottom:"15px"}}>
                   <span className="material-symbols-outlined">calendar_month</span>
-                  ShiftBoard
+                  Beach směny
               </Typography>
             <IconButton onClick={() => window.location.href= (CONF.origin + "oauth2/authorization/google")} sx={{borderRadius:0, display:"inline-flex", justifyContent:"space-between"}}>
                 <img src="/google.svg" alt="logo" color="white"/><Typography sx={{marginLeft:"15px"}}>Přihlásit se</Typography>

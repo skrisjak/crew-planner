@@ -6,17 +6,30 @@ import {useResponsive} from "../../hooks/Responsive";
 import AccessibilityIcon from '@mui/icons-material/Accessibility';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import {green, orange, red} from "@mui/material/colors";
 
 function getIcon(availability) {
     switch (availability) {
         case "WORKING":
-            return <CheckCircleIcon sx={{color: "green"}}/>
+            return <CheckCircleIcon sx={{color: green[500]}}/>;
         case "AVAILABLE":
-            return <AccessibilityIcon sx={{color: "yellow"}}/>
+            return <AccessibilityIcon sx={{color: orange[300]}}/>;
         default:
-            return <CancelIcon sx={{color: "red"}}/>
+            return <CancelIcon sx={{color: red[500]}}/>;
     }
 }
+
+function getColor(availability) {
+    switch (availability) {
+        case "WORKING":
+            return green[500];
+            case "AVAILABLE":
+                return orange[500];
+                default:
+                    return red[500];
+    }
+}
+
 
 const RegisteredWorker =(props) => {
     const [registeredWorker, setRegisteredWorker] = useState(props.registeredWorker);
@@ -65,7 +78,7 @@ const RegisteredWorker =(props) => {
     return (
         <>
             <Tooltip title={<Box maxWidth="20vw">{registeredWorker.note}</Box>} open={toolTipOpen} onOpen={e=> hasNote && setToolTipOpen(true)} onClose={e => setToolTipOpen(false)} onClick={openDialog}>
-                <Chip avatar={<Avatar src={registeredWorker.image} />} variant="filled" label={registeredWorker.user } icon={getIcon(registeredWorker.availability)} sx={{margin:"5px", ":hover":{scale:1.02}}}/>
+                <Chip avatar={<Avatar src={registeredWorker.image} />} variant="outlined" label={registeredWorker.user } deleteIcon={getIcon(registeredWorker.availability)} onDelete={openDialog} sx={{margin:"5px", ":hover":{scale:1.02}, "& .MuiChip-deleteIcon": {color:getColor(registeredWorker.availability)}, "& .MuiChip-deleteIcon:hover": {color:getColor(registeredWorker.availability)}}}/>
             </Tooltip>
             <Dialog open={dialogOpen} onClose={e => {setDialogOpen(false); e.stopPropagation();}} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "80vw" : "50vw",minHeight: "50vh", maxHeight:"90vh", padding:"10px", boxSizing:"border-box", overflowY:"auto"}}} onClick={e => e.stopPropagation()}>
                 <RegisterShift updatable access={updatable} registeredWorker={registeredWorker} addWorker={addWorker} deleteWorker={props.deleteWorker}/>

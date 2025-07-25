@@ -35,7 +35,7 @@ function PageLayout(props) {
                         <span className="material-symbols-outlined">calendar_month</span>
                     }
                     <Typography variant="h4" fontFamily="Nova Mono">
-                            ShiftBoard
+                            Beach Směny
                     </Typography>
                 </Box>
                 {profile?
