@@ -15,11 +15,40 @@ const monthNames = new Map([
     [12, "prosince"]
 ])
 
+const dayNames= new Map( [
+    [1, "Po"],
+    [2, "Út"],
+    [3, "St"],
+    [4, "Čt"],
+    [5, "Pá"],
+    [6, "So"],
+    [0, "Ne"]
+])
+
+const fullDayNames = new Map([
+    [1, "Pondělí"],
+    [2, "Úterý"],
+    [3, "Středa"],
+    [4, "Čtvrtek"],
+    [5, "Pátek"],
+    [6, "Sobota"],
+    [0, "Něděle"]
+]);
+
 const getDateText = (date) => {
     const d = dayjs(date);
     const month = monthNames.get(d.get("month") +1);
     const day = d.date();
-    return day + ". " +month;
+    const dayName = dayNames.get(d.day());
+    return dayName + ", " + day + ". " +month;
 }
 
-export {getDateText};
+const getFullDateText = (date) => {
+    const d = dayjs(date);
+    const month = monthNames.get(d.get("month") +1);
+    const day = d.date();
+    const dayName = fullDayNames.get(d.day());
+    return dayName + ", " + day + ". " +month;
+}
+
+export {getDateText, getFullDateText};

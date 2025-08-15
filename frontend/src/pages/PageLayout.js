@@ -27,8 +27,8 @@ function PageLayout(props) {
     }, [loadProfile]);
 
     return (
-        <Box container sx={{backgroundColor:"#f8fafd", height:"100vh",width:"100vw",minWidth:"100vw", maxWidth:"100vw", minHeight:"100vh", maxHeight:"100vh"}}>
-            <Box sx={{padding:"10px", display:"flex", justifyContent:"space-between", flexDirection:"row", alignItems:"center", height:"auto", minWidth:"100vw",  maxWidth:"100vw", boxSizing: "border-box", maxHeight: mobile? "10%": null}}>
+        <Box container sx={{backgroundColor:"#f8fafd", height:"100svh",width:"100svw",minWidth:"100svw", maxWidth:"100svw", minHeight:"100svh", maxHeight:"100svh"}}>
+            <Box sx={{padding:"10px", display:"flex", justifyContent:"space-between", flexDirection:"row", alignItems:"center", height:"auto", minWidth:"100svw",  maxWidth:"100svw", boxSizing: "border-box", maxHeight: mobile? "10%": null}}>
                 <Box sx={{display:"inline-flex", alignItems:'center'}}>
                     {mobile ?
                         <IconButton onClick={() => setOpen(true)}><MenuIcon /></IconButton> :
@@ -86,7 +86,7 @@ function PageLayout(props) {
                     {props.children}
                 </Box>
                 :
-                <Box container sx={{display:"flex", flexDirection:"row", justifyContent:"space-evenly",boxSizing:"border-box", minHeight:"90vh", maxHeight:"90vh",}}>
+                <Box container sx={{display:"flex", flexDirection:"row", justifyContent:"space-evenly",boxSizing:"border-box", minHeight:"90svh", maxHeight:"90svh",}}>
                     <Box container sx={{height:"100%", minWidth:"15%", maxWidth:"15%"}}>
                         <List>
                             <ListItem key="home" sx={{padding:0, margin:0}} onClick={()=> redirect("/home")}>

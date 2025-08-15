@@ -81,8 +81,8 @@ export default function WorkDay (props) {
                    sx={{ boxSizing:"border-box",minWidth: mobile? undefined : "30%", minHeight: mobile? "30%" : undefined,maxHeight:"100%", padding: "5px", marginRight: mobile ? undefined : "10px", marginBottom: mobile ? "10px" : undefined, cursor: "pointer", transition: "0.3s", "&:hover": {scale:1.01}, display:"flex", flexDirection:"row", flexWrap:"wrap", gap:2, alignItems:"flex-start", alignContent:"flex-start"}}
                    onClick={()=> {setActionDialogOpen(true)}}
             >
-                <Typography sx={{marginBottom:"10px", width:"100%"}}>{getDateText(workDay.date)}</Typography>
-                <Divider sx={{width:'100%', marginBottom:'10px'}}/>
+                <Typography sx={{marginBottom:mobile? undefined:"10px", width:"100%"}}>{getDateText(workDay.date)}</Typography>
+                <Divider sx={{width:'100%', marginBottom: mobile? undefined:'10px'}}/>
 
                 {notes? (notes.length > 0 && (
                             notes.map(note => {
