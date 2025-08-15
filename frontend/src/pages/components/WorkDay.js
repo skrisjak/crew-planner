@@ -84,17 +84,17 @@ export default function WorkDay (props) {
                 <Typography sx={{marginBottom:"10px", width:"100%"}}>{getDateText(workDay.date)}</Typography>
                 <Divider sx={{width:'100%', marginBottom:'10px'}}/>
 
-                {notes.length > 0 && (
+                {notes? (notes.length > 0 && (
                             notes.map(note => {
                                 return <WorkDayNote key={note.id} note={note} deleteNote={deleteNote}/>
                             })
-                )}
+                )): null}
 
-                {workers.length > 0 && (
+                {workers? (workers.length > 0 && (
                     workers.map(registeredWorker => {
                                 return <RegisteredWorker key={registeredWorker.id} registeredWorker={registeredWorker} addWorker={addWorker} deleteWorker={deleteWorker}/>
                     })
-                )}
+                )) : null}
             </Paper>
             <Dialog open={actionDialogOpen} onClose={()=>{setActionDialogOpen(false)}} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "80vw" : "50vw",minHeight: "50vh", maxHeight:"90vh", padding:"10px", boxSizing:"border-box", overflowY:"auto"}}}>
                 <Typography variant="h5">{getDateText(workDay.date)}</Typography>
