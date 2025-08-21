@@ -10,6 +10,7 @@ public class UserMapper {
         responseUser.setName(user.getName());
         responseUser.setRole(user.getRole());
         responseUser.setImage(user.getImage());
+        responseUser.setNickName(user.getNickName());
         return responseUser;
     }
 }

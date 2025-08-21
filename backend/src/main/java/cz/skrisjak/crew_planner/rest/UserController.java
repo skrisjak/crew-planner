@@ -48,10 +48,10 @@ public class UserController {
 
     @PutMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
-    public ResponseEntity<ResponseUser> updateUser(@RequestBody PostUser updateUser) {
+    public ResponseEntity<Void> updateUser(@RequestBody PostUser updateUser) {
         try {
-            User update = userService.updateUser(updateUser);
-            return ResponseEntity.accepted().body(UserMapper.map(update));
+            userService.updateUser(updateUser);
+            return ResponseEntity.accepted().build();
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(null);
         }

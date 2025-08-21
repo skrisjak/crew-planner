@@ -2,8 +2,10 @@ package cz.skrisjak.crew_planner.rest;
 
 import cz.skrisjak.crew_planner.data.*;
 import cz.skrisjak.crew_planner.mapper.PlanMapper;
+import cz.skrisjak.crew_planner.model.DefaultSlot;
 import cz.skrisjak.crew_planner.model.ShiftPlan;
 import cz.skrisjak.crew_planner.model.WorkDay;
+import cz.skrisjak.crew_planner.model.WorkDaySlot;
 import cz.skrisjak.crew_planner.service.PlanningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -97,6 +99,86 @@ public class PlanController {
     public ResponseEntity<Void> deleteNote(@RequestParam(name="noteId") Long noteId) {
         try {
             planningService.removeNote(noteId);
+            return ResponseEntity.accepted().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping(path="/defaultSlots")
+    public ResponseEntity<List<ResponseSlot>> getDefaultSlots() {
+        return ResponseEntity.ok(planningService.getDefaultSlots().stream().map(PlanMapper::mapSlot).toList());
+    }
+
+    @PostMapping(path="/defaultSlot")
+    public ResponseEntity<ResponseSlot> createDefaultSlot(@RequestBody PostSlot slot) {
+        DefaultSlot newSlot = planningService.addDefaultSlot(slot);
+        return ResponseEntity.ok(PlanMapper.mapSlot(newSlot));
+    }
+
+    @PutMapping(path="/defaultSlot")
+    public ResponseEntity<Void> updateDefaultSlot(@RequestBody PostSlot slot) {
+        try {
+            planningService.updateDefaultSlot(slot);
+            return ResponseEntity.accepted().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping(path="/defaultSlot")
+    public ResponseEntity<Void> deleteDefaultSlot(@RequestParam(name="slotId") Long slotId) {
+        try {
+            planningService.deleteDefaultSlot(slotId);
+            return ResponseEntity.accepted().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping(path="/slot")
+    public ResponseEntity<ResponseSlot> createSlot(@RequestBody PostSlot slot) {
+        try {
+            return ResponseEntity.ok(PlanMapper.mapSlot(planningService.createSlot(slot)));
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping(path="/slot")
+    public ResponseEntity<Void> updateSlot(@RequestBody PostSlot slot) {
+        try {
+            planningService.updateSlot(slot);
+            return ResponseEntity.accepted().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping(path="/slot")
+    public ResponseEntity<Void> deleteSlot(@RequestParam(name="slotId") Long slotId) {
+        try {
+            planningService.deleteSlot(slotId);
+            return ResponseEntity.accepted().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping(path = "/slot/user")
+    public ResponseEntity<Void> putUserToSlot(@RequestBody PostSlotPlan slot) {
+        try {
+            planningService.addUserToSlot(slot);
+            return ResponseEntity.accepted().build();
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping(path = "/slot/user")
+    public ResponseEntity<Void> deleteUserFromSlot(@RequestParam(name="slotId") Long slotId) {
+        try {
+            planningService.deleteUserFromSlot(slotId);
             return ResponseEntity.accepted().build();
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();

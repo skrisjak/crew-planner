@@ -1,12 +1,7 @@
 package cz.skrisjak.crew_planner.mapper;
 
-import cz.skrisjak.crew_planner.data.Plan;
-import cz.skrisjak.crew_planner.data.ResponseNote;
-import cz.skrisjak.crew_planner.data.ResponseShiftPlan;
-import cz.skrisjak.crew_planner.data.WorkDayPlan;
-import cz.skrisjak.crew_planner.model.ShiftPlan;
-import cz.skrisjak.crew_planner.model.WorkDay;
-import cz.skrisjak.crew_planner.model.WorkDayNote;
+import cz.skrisjak.crew_planner.data.*;
+import cz.skrisjak.crew_planner.model.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -39,6 +34,9 @@ public class PlanMapper {
         if (workDay.getNotes() != null) {
             dayPlan.setNotes(workDay.getNotes().stream().map(PlanMapper::mapNote).toList());
         }
+        if (workDay.getSlots() != null) {
+            dayPlan.setSlots(workDay.getSlots().stream().map(PlanMapper::mapSlot).toList());
+        }
         dayPlan.setId(workDay.getId());
         dayPlan.setRegisteredWorkers(mapPlans(workDay.getRegisteredEmployees()));
         return dayPlan;
@@ -70,5 +68,33 @@ public class PlanMapper {
         rn.setId(note.getId());
         rn.setWorkDayId(note.getWorkDay().getId());
         return rn;
+    }
+
+    public static ResponseSlot mapSlot(WorkDaySlot slot) {
+        ResponseSlot rs = new ResponseSlot();
+        rs.setId(slot.getId());
+        rs.setDate(slot.getWorkDay().getDate());
+        if (slot.getDefaultSlot() != null) {
+            rs.setSlotName(slot.getDefaultSlot().getSlotName());
+        } else {
+            rs.setSlotName(slot.getSlotName());
+        }
+        User u = slot.getUser();
+
+        if (u != null) {
+            if (u.getNickName() != null && u.getNickName() != "") {
+                rs.setRegisteredWorkerName(u.getNickName());
+            } else {
+                rs.setRegisteredWorkerName(u.getName());
+            }
+        }
+        return rs;
+    }
+
+    public static ResponseSlot mapSlot(DefaultSlot slot) {
+        ResponseSlot rs = new ResponseSlot();
+        rs.setId(slot.getId());
+        rs.setSlotName(slot.getSlotName());
+        return rs;
     }
 }

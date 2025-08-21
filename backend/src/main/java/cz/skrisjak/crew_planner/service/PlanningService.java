@@ -2,14 +2,10 @@ package cz.skrisjak.crew_planner.service;
 
 import cz.skrisjak.crew_planner.data.PostNote;
 import cz.skrisjak.crew_planner.data.PostShiftPlan;
-import cz.skrisjak.crew_planner.model.ShiftPlan;
-import cz.skrisjak.crew_planner.model.User;
-import cz.skrisjak.crew_planner.model.WorkDay;
-import cz.skrisjak.crew_planner.model.WorkDayNote;
-import cz.skrisjak.crew_planner.repository.ShiftPlanRepository;
-import cz.skrisjak.crew_planner.repository.UserRepository;
-import cz.skrisjak.crew_planner.repository.WorkDayNoteRepository;
-import cz.skrisjak.crew_planner.repository.WorkDayRepository;
+import cz.skrisjak.crew_planner.data.PostSlot;
+import cz.skrisjak.crew_planner.data.PostSlotPlan;
+import cz.skrisjak.crew_planner.model.*;
+import cz.skrisjak.crew_planner.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +15,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,13 +24,19 @@ public class PlanningService {
     private final WorkDayRepository repository;
     private final WorkDayNoteRepository noteRepository;
     private final ShiftPlanRepository shiftPlanRepository;
+    private final DefaultSlotRepository defaultSlotRepository;
+    private final WorkDaySlotRepository slotRepository;
+    private final WorkDayRepository workDayRepository;
 
     @Autowired
-    public PlanningService(WorkDayRepository repository, WorkDayNoteRepository noteRepository, ShiftPlanRepository shiftPlanRepository, UserRepository userRepository) {
+    public PlanningService(WorkDayRepository repository, WorkDayNoteRepository noteRepository, ShiftPlanRepository shiftPlanRepository, UserRepository userRepository, DefaultSlotRepository defaultSlotRepository, WorkDaySlotRepository slotRepository, WorkDayRepository workDayRepository) {
         this.repository = repository;
         this.noteRepository = noteRepository;
         this.shiftPlanRepository = shiftPlanRepository;
         this.userRepository = userRepository;
+        this.defaultSlotRepository = defaultSlotRepository;
+        this.slotRepository = slotRepository;
+        this.workDayRepository = workDayRepository;
     }
 
     public List<WorkDay> getWeekPlan() {
@@ -64,8 +65,23 @@ public class PlanningService {
                 newWorkDay.setDate(currentDate);
                 newWorkDay = repository.save(newWorkDay);
                 weekPlan.add(newWorkDay);
+                workDay = newWorkDay;
             } else {
                 weekPlan.add(workDay);
+            }
+
+            if (workDay.getSlots() == null || workDay.getSlots().isEmpty()) {
+                if (workDay.getSlots()==null) {
+                    workDay.setSlots(new ArrayList<>());
+                }
+                WorkDay finalWorkDay = workDay;
+                defaultSlotRepository.findAll().forEach(defaultSlot -> {
+                    WorkDaySlot workDaySlot = new WorkDaySlot();
+                    workDaySlot.setDefaultSlot(defaultSlot);
+                    workDaySlot.setWorkDay(finalWorkDay);
+                    finalWorkDay.getSlots().add(workDaySlot);
+                    slotRepository.save(workDaySlot);
+                });
             }
         }
         return weekPlan;
@@ -94,6 +110,7 @@ public class PlanningService {
         noteRepository.delete(note);
     }
 
+    @Transactional
     public ShiftPlan addUserToWorkDay(PostShiftPlan shiftPlan) throws Exception {
         User user = userRepository.findByEmail(shiftPlan.getUserEmail()).orElseThrow();
         WorkDay workDay = repository.findById(shiftPlan.getWorkDayId()).orElseThrow();
@@ -109,6 +126,7 @@ public class PlanningService {
         return plan;
     }
 
+    @Transactional
     public void updateUserToWorkDay(PostShiftPlan shiftPlan) {
         WorkDay workDay = repository.findById(shiftPlan.getWorkDayId()).orElseThrow();
         workDay.getRegisteredEmployees()
@@ -129,11 +147,76 @@ public class PlanningService {
         shiftPlanRepository.delete(plan);
     }
 
+    @Transactional
+    public DefaultSlot addDefaultSlot(PostSlot postSlot) {
+        DefaultSlot slot = new DefaultSlot();
+        slot.setSlotName(postSlot.getSlotName());
+        slot = defaultSlotRepository.save(slot);
+        DefaultSlot finalSlot = slot;
+        workDayRepository.findAll().forEach(workDay -> {
+            WorkDaySlot workDaySlot = new WorkDaySlot();
+            workDaySlot.setWorkDay(workDay);
+            workDaySlot.setDefaultSlot(finalSlot);
+            slotRepository.save(workDaySlot);
+        });
+        return slot;
+    }
+
+    public void deleteDefaultSlot(Long slotId) {
+        DefaultSlot slot = defaultSlotRepository.findById(slotId).orElseThrow();
+        defaultSlotRepository.delete(slot);
+    }
+
+    public void updateDefaultSlot(PostSlot slot) {
+        DefaultSlot update = defaultSlotRepository.findById(slot.getId()).orElseThrow();
+        update.setSlotName(slot.getSlotName());
+        defaultSlotRepository.save(update);
+    }
+
+    public WorkDaySlot createSlot(PostSlot postSlot) {
+        WorkDaySlot workDaySlot = new WorkDaySlot();
+        workDaySlot.setSlotName(postSlot.getSlotName());
+        if (postSlot.getUser() != null) {
+            workDaySlot.setUser(userRepository.findByEmail(postSlot.getUser()).orElseThrow());
+        }
+        if (postSlot.getWorkDayId() != null) {
+            workDaySlot.setWorkDay(workDayRepository.findById(postSlot.getWorkDayId()).orElseThrow());
+        }
+        return slotRepository.save(workDaySlot);
+    }
+
+    public void updateSlot(PostSlot updatedSlot) {
+        WorkDaySlot workDaySlot = slotRepository.findById(updatedSlot.getId()).orElseThrow();
+        workDaySlot.setSlotName(updatedSlot.getSlotName());
+    }
+
+    public void deleteSlot(Long slotId) {
+        WorkDaySlot slot = slotRepository.findById(slotId).orElseThrow();
+        slotRepository.delete(slot);
+    }
+
+    public void addUserToSlot(PostSlotPlan slot) {
+        User user= userRepository.findByEmail(slot.getUser()).orElseThrow();
+        WorkDaySlot workSlot = slotRepository.findById(slot.getSlotId()).orElseThrow();
+        workSlot.setUser(user);
+        slotRepository.save(workSlot);
+    }
+
+    public void deleteUserFromSlot(Long slotId) {
+        WorkDaySlot workSlot = slotRepository.findById(slotId).orElseThrow();
+        workSlot.setUser(null);
+        slotRepository.save(workSlot);
+    }
+
     private List<WorkDay> findByDate(LocalDate date) {
         return repository.findByDate(date);
     }
 
     private List<WorkDay> findByDateBetween(LocalDate date1, LocalDate date2) {
         return repository.findByDateBetween(date1, date2);
+    }
+
+    public List<DefaultSlot> getDefaultSlots() {
+        return defaultSlotRepository.findAll();
     }
 }

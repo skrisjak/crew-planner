@@ -18,4 +18,7 @@ public class WorkDay extends BasicEntity {
 
     @OneToMany(mappedBy = "workDay", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShiftPlan> registeredEmployees;
+
+    @OneToMany(mappedBy = "workDay", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<WorkDaySlot> slots;
 }

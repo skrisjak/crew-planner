@@ -1,4 +1,7 @@
 package cz.skrisjak.crew_planner.repository;
 
-public interface DefaultSlotRepository {
+import cz.skrisjak.crew_planner.model.DefaultSlot;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface DefaultSlotRepository extends JpaRepository<DefaultSlot, Long> {
 }

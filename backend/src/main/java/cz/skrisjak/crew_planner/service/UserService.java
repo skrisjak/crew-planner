@@ -30,13 +30,12 @@ public class UserService {
         return user;
     }
 
-    public User updateUser(PostUser updateUser) {
+    public void updateUser(PostUser updateUser) {
         User user = userRepository.findByEmail(updateUser.getEmail()).orElseThrow();
         user.setName(updateUser.getName());
-        user.setEmail(updateUser.getEmail());
         user.setNickName(updateUser.getNickName());
         user.setRole(updateUser.getRole());
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     public User createNewUser(PostUser newUser) {
