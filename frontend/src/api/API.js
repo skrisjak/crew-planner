@@ -91,6 +91,42 @@ class API {
     static deleteWorker = async (workerId) => {
         return await API.doRequest("plan/worker?planId=" + workerId, "DELETE");
     }
+
+    static getDefaultSlots = async () => {
+        return await API.doRequest("plan/defaultSlots");
+    }
+
+    static createDefaultSlot = async (postSlot) => {
+        return await API.doRequest("plan/defaultSlot", "POST", postSlot);
+    }
+
+    static updateDefaultSlot = async (postSlot) => {
+        return await API.doRequest("plan/defaultSlot", "PUT", postSlot);
+    }
+
+    static deleteDefaultSlot = async (slotId) => {
+        return await API.doRequest("plan/defaultSlot?slotId=" + slotId, "DELETE");
+    }
+
+    static createSlot = async (postSlot) => {
+        return await API.doRequest("plan/slot", "POST", postSlot);
+    }
+
+    static updateSlot = async (postSlot) => {
+        return await API.doRequest("plan/slot", "PUT", postSlot);
+    }
+
+    static deleteSlot = async (slotId) => {
+        return await API.doRequest("plan/slot?slotId=" +slotId, "DELETE");
+    }
+
+    static addUserToSlots = async (postSlotPlan) => {
+        return await API.doRequest("plan/slot/user", "PUT", postSlotPlan);
+    }
+
+    static removeUserFromSlot = async (slotId) => {
+        return await API.doRequest("plan/slot/user?slotId=" + slotId, "DELETE");
+    }
 }
 
 export default API;

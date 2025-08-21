@@ -76,7 +76,7 @@ const WorkDayNote = (props) => {
                     }
                 </Box>
                 {expanded && <Divider/>}
-                <Box sx={{maxHeight: expanded? "auto" : 0, width:"100%", border:"0:5px solid grey", borderBottomRightRadius:"5px", borderBottomLeftRadius:"5px", transition:"max-height 0.3s ease-in-out, padding 0.3s ease"}}>{expanded && note.description}</Box>
+                <Box sx={{whiteSpace: "pre-line",maxHeight: expanded? "auto" : 0, width:"100%", border:"0:5px solid grey", borderBottomRightRadius:"5px", borderBottomLeftRadius:"5px", transition:"max-height 0.3s ease-in-out, padding 0.3s ease"}}>{expanded && note.description}</Box>
             </Paper>
             <Dialog open={modalOpen} onClose={() => setModalOpen(false)} onClick={(e)=> e.stopPropagation()} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "80vw" : "50vw",height: "50vh", padding:"10px", boxSizing:"border-box", overflowY:"auto"}}}>
                 <Box container sx={{width:'100%', display:"flex", flexDirection: mobile? "column" :"row", flexWrap: mobile? undefined :"wrap", gap:"1%"}}>
@@ -85,15 +85,16 @@ const WorkDayNote = (props) => {
                     </Typography>
                     <TextField sx={{width: mobile? "100%": "28%"}} id="label" variant="outlined" value={updateLabel} onChange={(e) => setUpdateLabel(e.target.value)} label={undefined} margin="dense"/>
                     <TextField sx={{width: mobile? "100%": "68%"}} id="note" variant="outlined" value={updateDescription} onChange={(e) => setUpdateDescription(e.target.value)} label={undefined} multiline margin="dense" />
-                    <Box sx={{display:"flex", flexDirection:"row-reverse", width:mobile? '100%': "96%"}}>
+                    <Box sx={{display:"flex", flexDirection:"row-reverse", gap:"1%", width:mobile? '100%': "96%"}}>
+
+                        <Button onClick={deleteNote} variant="outlined" loading={deleting}>
+                            Smazat
+                        </Button>
 
                         <Button onClick={updateNote} variant="contained" loading={updating}>
                             Upravit
                         </Button>
 
-                        <Button onClick={deleteNote} variant="outlined" loading={deleting}>
-                            Smazat
-                        </Button>
                     </Box>
                     <Divider sx={{marginBottom:"10px"}}/>
                 </Box>

@@ -86,7 +86,7 @@ const Users = () => {
             await API.deleteUser(selectedUser.email);
             setSelectedUser(null);
         } catch (error) {
-            alert(error)
+            alert(error);
         } finally {
             setLoading(false);
         }

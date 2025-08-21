@@ -14,8 +14,8 @@ const AddNote = (props) => {
         <Typography variant="h6" sx={{width:"100%"}}>
             Přidat poznámku
         </Typography>
-        <TextField sx={{width: mobile? "100%": "28%"}} id="label" variant="standard" value={label} onChange={(e) => setLabel(e.target.value)} label="Nadpis" margin="dense"/>
-        <TextField sx={{width: mobile? "100%": "68%"}} id="note" variant="standard" value={note} onChange={(e) => setNote(e.target.value)} label="Poznámky" multiline margin="dense" />
+        <TextField sx={{width: mobile? "100%": "28%"}} id="label" variant="outlined" value={label} onChange={(e) => setLabel(e.target.value)} label="Nadpis" margin="dense"/>
+        <TextField sx={{width: mobile? "100%": "68%"}} id="note" variant="outlined" value={note} onChange={(e) => setNote(e.target.value)} label="Poznámky" multiline margin="dense" />
         <Box sx={{display:"flex", flexDirection:"row-reverse", width:mobile? '100%': "96%"}}>
             <Button
                 loading={loading}
@@ -28,7 +28,7 @@ const AddNote = (props) => {
                 Přidat poznámku
             </Button>
         </Box>
-        <Divider sx={{marginBottom:"10px"}}/>
+        <Divider sx={{marginBottom:"10px", marginTop:"10px"}}/>
     </Box>
     )
 }

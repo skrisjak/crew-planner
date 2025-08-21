@@ -27,8 +27,8 @@ function PageLayout(props) {
     }, [loadProfile]);
 
     return (
-        <Box container sx={{backgroundColor:"#f8fafd", height:"100svh",width:"100svw",minWidth:"100svw", maxWidth:"100svw", minHeight:"100svh", maxHeight:"100svh"}}>
-            <Box sx={{padding:"10px", display:"flex", justifyContent:"space-between", flexDirection:"row", alignItems:"center", height:"auto", minWidth:"100svw",  maxWidth:"100svw", boxSizing: "border-box", maxHeight: mobile? "10%": null}}>
+        <Box container sx={{backgroundColor:"#f8fafd", height:"100%",width:"100%", maxHeight:"100%", maxWidth:"100%"}}>
+            <Box sx={{padding:"10px", display:"flex", justifyContent:"space-between", flexDirection:"row", alignItems:"center", height:"auto", minWidth:"100%",  maxWidth:"100%", boxSizing: "border-box", maxHeight: mobile? "10%": null}}>
                 <Box sx={{display:"inline-flex", alignItems:'center'}}>
                     {mobile ?
                         <IconButton onClick={() => setOpen(true)}><MenuIcon /></IconButton> :
@@ -69,6 +69,11 @@ function PageLayout(props) {
                                     <ListItemText>Hodiny</ListItemText>
                                 </ListItemButton>
                             </ListItem>
+                            <ListItem key="shoplist" sx={{padding:0, margin:0}}>
+                                <ListItemButton>
+                                    Nákup
+                                </ListItemButton>
+                            </ListItem>
 
                             {
                                 profile && ["ADMIN", "MANAGER"].includes(profile.role) && (
@@ -100,6 +105,12 @@ function PageLayout(props) {
                                 </ListItemButton>
                             </ListItem>
 
+                            <ListItem key="shoplist" sx={{padding:0, margin:0}}>
+                                <ListItemButton>
+                                    Nákup
+                                </ListItemButton>
+                            </ListItem>
+
                             {
                                 profile && ["ADMIN", "MANAGER"].includes(profile.role) && (
                                     <ListItem key="users" sx={{padding:0, margin:0}} onClick={()=> redirect("/users")}>
@@ -111,6 +122,7 @@ function PageLayout(props) {
                             }
                         </List>
                         {(!mobile && props.calendar) && props.calendar}
+                        {profile && ["ADMIN", "MANAGER"].includes(profile.role) && props.otherChildren && props.otherChildren}
                     </Box>
                     <Box container sx={{borderRadius:"5px", backgroundColor:"white", padding:"10px",  minHeight:"100%", minWidth:"80%", maxWidth:"80%", overflow:"scroll"}}>{props.children}</Box>
                 </Box>

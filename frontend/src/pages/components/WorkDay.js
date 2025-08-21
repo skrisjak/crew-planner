@@ -14,15 +14,18 @@ import WorkDayNote from "./WorkDayNote";
 import RegisteredWorker from "./RegisteredWorker";
 import AddNote from "./AddNote";
 import RegisterShift from "./RegisterShift";
-import AddUserToShift from "./AddUserToShift";
+import WorkDaySlot from "./WorkDaySlot";
+import SlotsManagement from "./SlotsManagement";
 
 export default function WorkDay (props) {
     const workDay = props.workDay;
     const [notes, setNotes] = useState(workDay.notes);
     const [workers, setWorkers] = useState(workDay.registeredWorkers);
+    const [slots, setSlots] = useState(workDay.slots);
     const {mobile} = useResponsive();
     const [actionDialogOpen, setActionDialogOpen] = useState(false);
     const profile = useProfile(set => set.profile);
+
 
     const addNote = async (label,note) => {
         try {
@@ -75,14 +78,37 @@ export default function WorkDay (props) {
         setWorkers(updatedWorkers);
     }
 
+    const updateSlot = (slotId, updatedSlot) => {
+        setSlots(prevState => {
+            return prevState.map(slot => {
+                if (slot.id === slotId) {
+                    return updatedSlot;
+                }
+                return slot;
+            })
+        });
+    }
+
+    const deleteSlot = (slotId) => {
+        setSlots(prevState => {
+            return prevState.filter(slot => slot.id !== slotId);
+        });
+    }
+
+    const addSlot = (slot) => {
+        setSlots(prevState =>
+            [...prevState, slot]
+        )
+    }
+
     return (
         <>
             <Paper id={dayjs(workDay.date).format("YYYY-MM-DD")}
-                   sx={{ boxSizing:"border-box",minWidth: mobile? undefined : "30%", minHeight: mobile? "30%" : undefined,maxHeight:"100%", padding: "5px", marginRight: mobile ? undefined : "10px", marginBottom: mobile ? "10px" : undefined, cursor: "pointer", transition: "0.3s", "&:hover": {scale:1.01}, display:"flex", flexDirection:"row", flexWrap:"wrap", gap:2, alignItems:"flex-start", alignContent:"flex-start"}}
+                   sx={{ boxSizing:"border-box",minWidth: mobile? undefined : "30%", minHeight: mobile? "30%" : undefined,maxHeight:"100%", padding: "5px", marginRight: mobile ? undefined : "10px", marginBottom: mobile ? "10px" : undefined, cursor: "pointer", transition: "0.3s", "&:hover": {scale:1.01}, display:"flex", flexDirection:"row", flexWrap:"wrap", gap:1, alignItems:"flex-start", alignContent:"flex-start"}}
                    onClick={()=> {setActionDialogOpen(true)}}
             >
                 <Typography sx={{marginBottom:mobile? undefined:"10px", width:"100%"}}>{getDateText(workDay.date)}</Typography>
-                <Divider sx={{width:'100%', marginBottom: mobile? undefined:'10px'}}/>
+                <Divider sx={{width:'100%'}}/>
 
                 {notes? (notes.length > 0 && (
                             notes.map(note => {
@@ -90,24 +116,35 @@ export default function WorkDay (props) {
                             })
                 )): null}
 
-                {workers? (workers.length > 0 && (
-                    workers.map(registeredWorker => {
-                                return <RegisteredWorker key={registeredWorker.id} registeredWorker={registeredWorker} addWorker={addWorker} deleteWorker={deleteWorker}/>
+                {slots? (slots?.length > 0 && (
+                    slots?.map(slot => {
+                        return <WorkDaySlot key={slot.id} slot={slot} updateSlot={updateSlot}/>
                     })
+                )): null}
+
+                {workers? (workers.length > 0 && (
+                    <>
+                        <Divider sx={{width:"100%"}}/>
+                        {workers.map(registeredWorker => {
+                                return <RegisteredWorker key={registeredWorker.id} registeredWorker={registeredWorker} addWorker={addWorker} deleteWorker={deleteWorker}/>
+                        })
+                        }
+                    </>
                 )) : null}
             </Paper>
-            <Dialog open={actionDialogOpen} onClose={()=>{setActionDialogOpen(false)}} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "80vw" : "50vw",minHeight: "50vh", maxHeight:"90vh", padding:"10px", boxSizing:"border-box", overflowY:"auto"}}}>
+            <Dialog open={actionDialogOpen} onClose={()=>{setActionDialogOpen(false)}} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "90vw" : "50vw",minHeight: "50vh", maxHeight:"90vh", padding:"10px", boxSizing:"border-box", overflowY:"auto"}}}>
                 <Typography variant="h5">{getDateText(workDay.date)}</Typography>
                 <Divider sx={{marginBottom:"10px"}}/>
                 {profile && ["ADMIN", "MANAGER"].includes(profile.role) && (
                     <AddNote addNote={addNote}/>
                 )}
-                {profile && ["ADMIN", "EMPLOYEE"].includes(profile.role) && (
-                    <RegisterShift access addWorker={addWorker}/>
-                )}
 
                 {profile && ["ADMIN", "MANAGER"].includes(profile.role) && (
-                    <AddUserToShift addWorker={addWorker}/>
+                    <SlotsManagement addWorker={addWorker} slots={slots} updateSlot={updateSlot} addSlot={addSlot} deleteSlot={deleteSlot} dayId={workDay.id}/>
+                )}
+
+                {profile && ["ADMIN", "EMPLOYEE"].includes(profile.role) && (
+                    <RegisterShift access addWorker={addWorker}/>
                 )}
             </Dialog>
         </>

@@ -1,4 +1,4 @@
-import PageLayout from "../PageLayout";
+import PageLayout from "./PageLayout";
 
 const ShopList = () => {
     return (

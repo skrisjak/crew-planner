@@ -1,13 +1,33 @@
-import {Autocomplete, Avatar, Box, Button, MenuItem, Select, TextField, Typography} from "@mui/material";
-import {useEffect, useState} from "react";
-import {useResponsive} from "../../hooks/Responsive";
+import {Avatar, Box, IconButton, MenuItem, Select, TextField, Tooltip, Typography} from "@mui/material";
 import {useUsers} from "../../hooks/Users";
+import SlotManagement from "./SlotManagement";
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import {useResponsive} from "../../hooks/Responsive";
+import {useState} from "react";
+import API from "../../api/API";
 
-const AddUserToShift = (props) => {
-
-    const users = useUsers(s=> s.users);
-    const [selectedUser, setSelectedUser] = useState(null);
+const SlotsManagement = (props) => {
     const slots = props.slots;
+    const users = useUsers(s=> s.users);
+    const [slotName, setSlotName] = useState("");
+    const [selectedUser, setSelectedUser] = useState(null);
+    const mobile= useResponsive();
+
+    const addSlot = async () => {
+        try {
+            const newSlot = await API.createSlot({
+                id:null,
+                slotName: slotName,
+                user: selectedUser? selectedUser.email : null,
+                workDayId:props.dayId,
+            });
+            props.addSlot(newSlot);
+            setSlotName("");
+            setSelectedUser(null);
+        } catch (e) {
+            alert(e.message);
+        }
+    }
 
     return (
         <Box container sx={{width:'100%', display:"flex", flexDirection: "column"}}>
@@ -15,21 +35,27 @@ const AddUserToShift = (props) => {
                 Směny
             </Typography>
             <Box sx={{width:"100%"}}>
-
                 {slots.map(slot =>
-                <Box sx={{width:'100%', display:"flex", flexDirection:"row", justifyContent:"space-between"}}>
-                    <Box sx={{width:"75%"}}>
+                    <SlotManagement slot={slot} updateSlot={props.updateSlot} deleteSlot={props.deleteSlot} key={slot.id}/>
+                )}
+
+                <Box sx={{width:'100%', display:"flex", flexDirection:"row", alignItems:"center", justifyContent:"space-between", marginBottom:"10px"}}>
+
+                    <Box sx={{width: mobile? "38%" : "48%", padding:"5px"}}>
+                        <TextField value={slotName} onChange={e => setSlotName(e.target.value)} />
+                    </Box>
+                    <Box sx={{width: mobile? "38%" : "48%"}}>
                         <Select
-                            label="Uživatel"
-                            value={users.find(user => (user.email === selectedUser?.email))}
+                            value={selectedUser}
                             onChange={(e) => setSelectedUser(e.target.value)}
-                            variant="standard"
-                            options={users}
                             sx={{width:"100%"}}
                         >
+                            <MenuItem value={null}>
+                                Nikdo
+                            </MenuItem>
                             {users.map(option => (
-                                <MenuItem value={option.email}>
-                                    <Box component="li" {...props} sx={{ display: "flex", alignItems: "center" }}>
+                                <MenuItem value={option}>
+                                    <Box sx={{ display: "flex", alignItems: "center" }}>
                                         <Avatar
                                             src={option.image}
                                             sx={{ height: 24, width: 24, marginRight: "8px" }}
@@ -40,15 +66,18 @@ const AddUserToShift = (props) => {
                             ))}
                         </Select>
                     </Box>
-                    <Button sx={{width:"20%"}} variant="contained">
-                        Přidat
-                    </Button>
-
+                    <Box sx={{width:"20%", display:"flex", justifyContent:"space-evenly"}}>
+                        <Tooltip title="Přidat">
+                            <IconButton color="primary" onClick={addSlot}>
+                                <AddCircleIcon />
+                            </IconButton>
+                        </Tooltip>
+                    </Box>
                 </Box>
-                )}
             </Box>
+
         </Box>
     )
 }
 
-export default AddUserToShift;
+export default SlotsManagement;

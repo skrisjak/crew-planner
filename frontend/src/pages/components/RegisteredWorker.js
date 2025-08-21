@@ -45,10 +45,6 @@ const RegisteredWorker =(props) => {
 
         let canAccess = false;
 
-        if (["ADMIN", "MANAGER"].includes(profile.role)) {
-            canAccess = true;
-        }
-
         if (profile.nickName) {
             if (profile.nickName === registeredWorker.user) {
                 canAccess = true;
