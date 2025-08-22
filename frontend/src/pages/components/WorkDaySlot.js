@@ -15,6 +15,7 @@ import {useResponsive} from "../../hooks/Responsive";
 import {getFullDateText} from "../../util/days";
 import {useUsers} from "../../hooks/Users";
 import API from "../../api/API";
+import {usePlan} from "../../hooks/Plan";
 
 const WorkDaySlot = (props) => {
     const slot = props.slot;
@@ -26,6 +27,7 @@ const WorkDaySlot = (props) => {
             ? users.find(u => u.nickName === slot.registeredWorkerName || u.name === slot.registeredWorkerName)
             : null
     );
+    const {refreshPlan} = usePlan();
 
 
     const handleClick =(event) => {
@@ -54,6 +56,7 @@ const WorkDaySlot = (props) => {
             });
         } catch (error) {
             alert(error.message);
+            await refreshPlan();
         }
     }
 
