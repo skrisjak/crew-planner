@@ -9,5 +9,6 @@ public class ResponseSlot {
     private Long id;
     private String slotName;
     private String registeredWorkerName;
+    private String registeredWorkerImage;
     private LocalDate date;
 }

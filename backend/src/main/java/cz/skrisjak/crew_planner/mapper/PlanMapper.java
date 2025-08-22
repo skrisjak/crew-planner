@@ -74,7 +74,7 @@ public class PlanMapper {
         ResponseSlot rs = new ResponseSlot();
         rs.setId(slot.getId());
         rs.setDate(slot.getWorkDay().getDate());
-        if (slot.getDefaultSlot() != null) {
+        if (slot.getDefaultSlot() != null && slot.getSlotName() == null) {
             rs.setSlotName(slot.getDefaultSlot().getSlotName());
         } else {
             rs.setSlotName(slot.getSlotName());
@@ -87,6 +87,7 @@ public class PlanMapper {
             } else {
                 rs.setRegisteredWorkerName(u.getName());
             }
+            rs.setRegisteredWorkerImage(u.getImage());
         }
         return rs;
     }

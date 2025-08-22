@@ -41,7 +41,7 @@ public class PlanningService {
 
     public List<WorkDay> getWeekPlan() {
         LocalDate today = LocalDate.now(ZoneId.of("Europe/Prague"));
-        LocalDate weekLater = today.plusDays(7);
+        LocalDate weekLater = today.plusDays(6);
         return getPlan(today, weekLater);
     }
 
@@ -188,8 +188,9 @@ public class PlanningService {
     public void updateSlot(PostSlot updatedSlot) {
         WorkDaySlot workDaySlot = slotRepository.findById(updatedSlot.getId()).orElseThrow();
         workDaySlot.setSlotName(updatedSlot.getSlotName());
+        workDaySlot.setUser(userRepository.findByEmail(updatedSlot.getUser()).orElse(null));
+        slotRepository.save(workDaySlot);
     }
-
     public void deleteSlot(Long slotId) {
         WorkDaySlot slot = slotRepository.findById(slotId).orElseThrow();
         slotRepository.delete(slot);
