@@ -15,7 +15,6 @@ body {
   max-height: 100svh;
   min-width: 100svw;
   max-width: 100svw;
-    overflow: hidden;
 }
 
 code {
