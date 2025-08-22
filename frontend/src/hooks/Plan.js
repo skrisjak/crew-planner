@@ -4,7 +4,6 @@ import dayjs from "dayjs";
 import {useNavigate} from "react-router-dom";
 
 export const usePlan = () => {
-
     const redirect = useNavigate();
     const [loading, setLoading] = useState(true);
     const [plans, setPlans] = useState(new Map());
@@ -21,16 +20,16 @@ export const usePlan = () => {
             setStartDate(dayjs(newPlan.startDate));
             setEndDate(dayjs(newPlan.endDate));
 
-            const newPlans = new Map(plans);
+            setPlans(prevPlans => {
+                const newPlans = new Map(prevPlans);
+                newPlan.workDays.forEach(plan => {
+                    newPlans.set(dayjs(plan.date).format("YYYY-MM-DD"), plan);
+                });
+                return newPlans;
+            });
 
-            newPlan.workDays.forEach(plan => {
-                newPlans.set(dayjs(plan.date).format("YYYY-MM-DD"), plan);
-            })
-            setPlans(newPlans);
         } catch (error) {
-            if (error.message === "Unauthorized") {
-                redirect("/#error=Unauthorized");
-            }
+            alert(error.message);
         }
     };
 
@@ -72,6 +71,23 @@ export const usePlan = () => {
         }
     }
 
+    const refreshPlan = async () => {
+        try {
+            setLoading(true);
+            const rsp = await API.getPlan(startDate, endDate);
+            const newPlans = new Map(plans);
+            rsp.workDays.forEach(p => {
+                newPlans.set(dayjs(p.date).format("YYYY-MM-DD"), p);
+            });
+
+            setPlans(newPlans);
+            setPlan(rsp.workDays);
+            setLoading(false);
+        } catch (error) {
+            alert(error.message);
+        }
+    }
+
     useEffect(() => {
         setTimeout( () => {
             const element = document.getElementById(selectedDate.format("YYYY-MM-DD"));
@@ -81,5 +97,5 @@ export const usePlan = () => {
         },100);
     }, [selectedDate]);
 
-    return {loading, plan, updatePlan};
+    return {loading, plan, updatePlan, refreshPlan};
 }

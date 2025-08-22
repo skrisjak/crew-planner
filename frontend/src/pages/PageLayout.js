@@ -27,8 +27,8 @@ function PageLayout(props) {
     }, [loadProfile]);
 
     return (
-        <Box container sx={{backgroundColor:"#f8fafd", height:"100%",width:"100%", maxHeight:"100%", maxWidth:"100%"}}>
-            <Box sx={{padding:"10px", display:"flex", justifyContent:"space-between", flexDirection:"row", alignItems:"center", height:"auto", minWidth:"100%",  maxWidth:"100%", boxSizing: "border-box", maxHeight: mobile? "10%": null}}>
+        <Box container sx={{backgroundColor:"#f8fafd", height:"100vh",width:"100%", maxWidth:"100%", overflow:"hidden"}}>
+            <Box sx={{flexShrink:0,padding:"10px", display:"flex", justifyContent:"space-between", flexDirection:"row", alignItems:"center", height:"auto", minWidth:"100%",  maxWidth:"100%", boxSizing: "border-box", maxHeight: mobile? "10%": null}}>
                 <Box sx={{display:"inline-flex", alignItems:'center'}}>
                     {mobile ?
                         <IconButton onClick={() => setOpen(true)}><MenuIcon /></IconButton> :
@@ -55,7 +55,7 @@ function PageLayout(props) {
                 }
             </Box>
             {mobile?
-                <Box container sx={{boxSizing:"border-box", width:"100%", maxHeight:"90%", height:"90%", overflow:"hidden"}}>
+                <Box container sx={{boxSizing:"border-box", width:"100%", maxHeight:"90%", height:"90%", overflowY:"auto", flexGrow:1}}>
                     <SwipeableDrawer open={open} onClose={() => setOpen(false)} onOpen={()=>setOpen(true)}>
                         <Box sx={{width: width/2}}>
                         <List>
@@ -92,7 +92,7 @@ function PageLayout(props) {
                 </Box>
                 :
                 <Box container sx={{display:"flex", flexDirection:"row", justifyContent:"space-evenly",boxSizing:"border-box", minHeight:"90svh", maxHeight:"90svh",}}>
-                    <Box container sx={{height:"100%", minWidth:"15%", maxWidth:"15%"}}>
+                    <Box container sx={{height:"100%", width:"15%"}}>
                         <List>
                             <ListItem key="home" sx={{padding:0, margin:0}} onClick={()=> redirect("/home")}>
                                 <ListItemButton>

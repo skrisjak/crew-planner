@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {
     Avatar,
     Box,
@@ -17,7 +17,7 @@ import {useUsers} from "../../hooks/Users";
 import API from "../../api/API";
 
 const WorkDaySlot = (props) => {
-    const [slot, setSlot] = useState(props.slot);
+    const slot = props.slot;
     const [dialogOpen, setDialogOpen] = useState(false);
     const profile = useProfile(set => set.profile);
     const users = useUsers(set => set.users);
@@ -46,14 +46,12 @@ const WorkDaySlot = (props) => {
                 user: profile.email,
                 slotId: slot.id
             });
-            setSlot(prevState => {
-                return {
-                    ...prevState,
-                    registeredWorkerName: profile.nickName? profile.nickName : profile.name
-                }
-            })
             setDialogOpen(false);
-            props.updateSlot(slot.id,slot);
+            props.updateSlot(slot.id, {
+                ...slot,
+                registeredWorkerName: profile.nickName? profile.nickName : profile.name,
+                registeredWorkerImage: profile.image || "",
+            });
         } catch (error) {
             alert(error.message);
         }
@@ -62,14 +60,12 @@ const WorkDaySlot = (props) => {
     const freeSlot = async () => {
         try {
             await API.removeUserFromSlot(slot.id);
-            setSlot(prevState => {
-                return {
-                    ...prevState,
-                    registeredWorkerName: null
-                }
-            })
             setDialogOpen(false);
-            props.updateSlot(slot.id,slot);
+            props.updateSlot(slot.id, {
+                ...slot,
+                registeredWorkerName: null,
+                registeredWorkerImage: null,
+            });
         } catch (error) {
             alert(error.message);
         }
@@ -82,14 +78,12 @@ const WorkDaySlot = (props) => {
                     user: selectedUser.email,
                     slotId: slot.id
                 });
-                setSlot(prevState => {
-                    return {
-                        ...prevState,
-                        registeredWorkerName: selectedUser.nickName? selectedUser.nickName : selectedUser.name
-                    }
-                })
                 setDialogOpen(false);
-                props.updateSlot(slot.id, slot);
+                props.updateSlot(slot.id, {
+                    ...slot,
+                    registeredWorkerName: selectedUser? (selectedUser.nickName? selectedUser.nickName :selectedUser.name) : null,
+                    registeredWorkerImage: selectedUser ? (selectedUser.image ? selectedUser.image : "") : null,
+                });
             } catch (e) {
                 alert(e.message);
             }
@@ -98,11 +92,21 @@ const WorkDaySlot = (props) => {
         }
     }
 
+    useEffect(() => {
+        setSelectedUser(users.find(u => (u.nickName === slot.registeredWorkerName || u.name === slot.registeredWorkerName)));
+    }, [slot, users]);
+
     const {mobile} = useResponsive();
 
     return (
         <>
-            <Chip variant={slot.registeredWorkerName? undefined : "outlined"} sx={{width:'100%', borderRadius:"5px", justifyContent:"start"}} label={slot.slotName + " - " +(slot.registeredWorkerName? slot.registeredWorkerName :"volné místo")} onClick={handleClick}/>
+            <Chip
+                variant={slot.registeredWorkerName? undefined : "outlined"}
+                sx={{width:'100%', borderRadius:"5px", justifyContent:"start"}}
+                label={slot.slotName + " - " +(slot.registeredWorkerName? slot.registeredWorkerName :"volné místo")}
+                onClick={handleClick}
+                avatar={slot.registeredWorkerName? <Avatar src={slot.registeredWorkerImage? slot.registeredWorkerImage : ""}/> : undefined}
+            />
             <Dialog open={dialogOpen} onClose={handleClose} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "90vw" : "50vw",height: "50vh", padding:"10px", boxSizing:"border-box", overflowY:"auto"}}} onClick={e => e.stopPropagation()}>
                 <Box sx={{display:"inline-flex", justifyContent:"space-between"}}>
                     <Typography variant="h6">

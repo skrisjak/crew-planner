@@ -11,7 +11,7 @@ const SlotsManagement = (props) => {
     const users = useUsers(s=> s.users);
     const [slotName, setSlotName] = useState("");
     const [selectedUser, setSelectedUser] = useState(null);
-    const mobile= useResponsive();
+    const {mobile}= useResponsive();
 
     const addSlot = async () => {
         try {
@@ -36,37 +36,37 @@ const SlotsManagement = (props) => {
             </Typography>
             <Box sx={{width:"100%"}}>
                 {slots.map(slot =>
-                    <SlotManagement slot={slot} updateSlot={props.updateSlot} deleteSlot={props.deleteSlot} key={slot.id}/>
+                    <SlotManagement slot={slot} updateSlot={props.updateSlot} deleteSlot={props.deleteSlot} key={slot.id} dayId={props.dayId}/>
                 )}
 
-                <Box sx={{width:'100%', display:"flex", flexDirection:"row", alignItems:"center", justifyContent:"space-between", marginBottom:"10px"}}>
+                <Box sx={{width:'100%', display:"flex", flexWrap:"wrap", alignItems:"center", marginBottom:"10px",}}>
+                    <Box sx={{width: mobile?'100%':"78%", display:"flex", justifyContent:"space-between", padding:"5px"}}>
 
-                    <Box sx={{width: mobile? "38%" : "48%", padding:"5px"}}>
-                        <TextField value={slotName} onChange={e => setSlotName(e.target.value)} />
-                    </Box>
-                    <Box sx={{width: mobile? "38%" : "48%"}}>
-                        <Select
-                            value={selectedUser}
-                            onChange={(e) => setSelectedUser(e.target.value)}
-                            sx={{width:"100%"}}
-                        >
-                            <MenuItem value={null}>
-                                Nikdo
-                            </MenuItem>
-                            {users.map(option => (
-                                <MenuItem value={option}>
-                                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                                        <Avatar
-                                            src={option.image}
-                                            sx={{ height: 24, width: 24, marginRight: "8px" }}
-                                        />
-                                        {option.nickName ? option.nickName : option.name}
-                                    </Box>
+                        <TextField sx={{width: "48%"}} value={slotName} onChange={e => setSlotName(e.target.value)} />
+                        <Box sx={{width: "48%"}}>
+                            <Select
+                                value={selectedUser}
+                                onChange={(e) => setSelectedUser(e.target.value)}
+                                sx={{width:"100%"}}
+                            >
+                                <MenuItem value={null}>
+                                    Nikdo
                                 </MenuItem>
-                            ))}
-                        </Select>
+                                {users.map(option => (
+                                    <MenuItem value={option}>
+                                        <Box sx={{ display: "flex", alignItems: "center" }}>
+                                            <Avatar
+                                                src={option.image}
+                                                sx={{ height: 24, width: 24, marginRight: "8px" }}
+                                            />
+                                            {option.nickName ? option.nickName : option.name}
+                                        </Box>
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </Box>
                     </Box>
-                    <Box sx={{width:"20%", display:"flex", justifyContent:"space-evenly"}}>
+                    <Box sx={{width: mobile? "100%":"20%", display:"flex", justifyContent: mobile? "flex-end" : "space-evenly"}}>
                         <Tooltip title="Přidat">
                             <IconButton color="primary" onClick={addSlot}>
                                 <AddCircleIcon />

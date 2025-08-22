@@ -16,7 +16,7 @@ import DefaultSlotManagement from "./components/DefaultSlotManagement";
 function Home() {
     const {mobile, fullScreen} =useResponsive();
     const [selectedDate, setSelectedDate] = useState(dayjs());
-    const {loading, plan, updatePlan} = usePlan();
+    const {loading, plan, updatePlan, refreshPlan} = usePlan();
     const [open, setOpen] = useState(false);
     const user = useProfile(set => set.profile);
     const users = useUsers(st => st.users);
@@ -37,12 +37,15 @@ function Home() {
         updatePlan(date);
     }
 
-    const weatherData = useWeather(state => state.weatherData);
     const getWeatherData = useWeather(state => state.getWeatherData);
 
     useEffect(() => {
         getWeatherData();
     }, [getWeatherData]);
+
+    const refresh = async () => {
+        await refreshPlan();
+    }
 
     return (
         <PageLayout
@@ -56,19 +59,19 @@ function Home() {
                     </LocalizationProvider>
             }
 
-            otherChildren={mobile? null : <DefaultSlotManagement/>}
+            otherChildren={mobile? null : <DefaultSlotManagement refreshPlan={refresh} />}
         >
             {mobile?
                 <Box sx={{display:"flex", flexDirection: "column", width:'100%', height:"100%", alignItems:"stretch", boxSizing:"border-box"}}>
-                    <Box sx={{padding: "10px", height:"10%"}}>
+                    <Box sx={{padding: "10px", height:"10%", display:"inline-flex", justifyContent:"space-between", alignItems:'center'}}>
                         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="cs">
                             <MobileDatePicker value={selectedDate} onChange={updateCalenderView} open={open} onOpen={()=> setOpen(true)}/>
                         </LocalizationProvider>
                         {user && ["ADMIN", "MANAGER"].includes(user.role) &&
-                            <DefaultSlotManagement/>
+                            <DefaultSlotManagement refreshPlan={refresh}/>
                         }
                     </Box>
-                    <Box sx={{boxSizing:"border-box", display:"block", flexDirection:"column", alignItems:"stretch", alignContent:"flex-start", height:"90%", overflow:"scroll", padding:"10px"}}>
+                    <Box sx={{boxSizing:"border-box", display:"block", flexDirection:"column", alignItems:"stretch", alignContent:"flex-start", height:"90%", overflow:"auto", padding:"10px"}}>
                         {loading?
                             <CircularProgress/> :
                                 plan.map(workDay => <WorkDay workDay={workDay} key={workDay.date}/>

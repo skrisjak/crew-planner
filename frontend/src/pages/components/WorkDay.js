@@ -1,4 +1,5 @@
 import {
+    Box,
     Dialog,
     Divider,
     Paper,
@@ -16,6 +17,7 @@ import AddNote from "./AddNote";
 import RegisterShift from "./RegisterShift";
 import WorkDaySlot from "./WorkDaySlot";
 import SlotsManagement from "./SlotsManagement";
+import Weather from "./Weather";
 
 export default function WorkDay (props) {
     const workDay = props.workDay;
@@ -69,12 +71,12 @@ export default function WorkDay (props) {
     }
 
     const deleteNote = (noteId) => {
-        let updatedNotes = notes.filter(note => note.id !== noteId);
+        const updatedNotes = notes.filter(note => note.id !== noteId);
         setNotes(updatedNotes);
     }
 
     const deleteWorker= (workerId) => {
-        let updatedWorkers = workers.filter(worker => worker.id !== workerId);
+        const updatedWorkers = workers.filter(worker => worker.id !== workerId);
         setWorkers(updatedWorkers);
     }
 
@@ -107,7 +109,10 @@ export default function WorkDay (props) {
                    sx={{ boxSizing:"border-box",minWidth: mobile? undefined : "30%", minHeight: mobile? "30%" : undefined,maxHeight:"100%", padding: "5px", marginRight: mobile ? undefined : "10px", marginBottom: mobile ? "10px" : undefined, cursor: "pointer", transition: "0.3s", "&:hover": {scale:1.01}, display:"flex", flexDirection:"row", flexWrap:"wrap", gap:1, alignItems:"flex-start", alignContent:"flex-start"}}
                    onClick={()=> {setActionDialogOpen(true)}}
             >
-                <Typography sx={{marginBottom:mobile? undefined:"10px", width:"100%"}}>{getDateText(workDay.date)}</Typography>
+                <Box sx={{marginBottom:mobile? undefined:"10px", width:"100%", display:"inline-flex", alignItems:"flex-end", justifyContent:"space-between"}}>
+                    <Typography>{getDateText(workDay.date)}</Typography>
+                    <Weather date={workDay.date} />
+                </Box>
                 <Divider sx={{width:'100%'}}/>
 
                 {notes? (notes.length > 0 && (

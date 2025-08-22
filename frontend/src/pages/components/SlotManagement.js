@@ -8,7 +8,7 @@ import API from "../../api/API";
 
 const SlotManagement = (props) => {
     const slot = props.slot;
-    const mobile = useResponsive();
+    const {mobile} = useResponsive();
     const users = useUsers(s=> s.users);
     const [selectedUser, setSelectedUser] = useState(
         (users && slot.registeredWorkerName)
@@ -19,12 +19,23 @@ const SlotManagement = (props) => {
 
     const update = async () => {
         try {
-            await API.updateSlot({
+            const updatedSlot = {
                 ...slot,
-                user: selectedUser? selectedUser.email : null,
+                slotName: slotName,
+                registeredWorkerName: selectedUser
+                    ? (selectedUser.nickName ? selectedUser.nickName : selectedUser.name)
+                    : null,
+                registeredWorkerImage: selectedUser ? (selectedUser.image ? selectedUser.image : "") : null,
+            };
+
+            await API.updateSlot({
+                id: slot.id,
+                workDayId: props.dayId,
+                user: selectedUser ? selectedUser.email : null,
                 slotName: slotName,
             });
-            props.updateSlot(slot.id,slot);
+
+            props.updateSlot(slot.id, updatedSlot);
         } catch (e) {
             alert(e.message);
         }
@@ -40,12 +51,12 @@ const SlotManagement = (props) => {
     }
 
     return (
-        <Box sx={{width:'100%', display:"flex", flexDirection:"row", alignItems:"center", justifyContent:"space-between", marginBottom:"10px"}}>
+        <Box sx={{width:'100%', alignItems:"center", marginBottom:"10px", display:"flex", flexWrap:"wrap"}}>
 
-            <Box sx={{width: mobile? "38%" : "48%", padding:"5px"}}>
-                <TextField value={slotName} onChange={e => setSlotName(e.target.value)} />
-            </Box>
-            <Box sx={{width: mobile? "38%" : "48%"}}>
+            <Box sx={{width: mobile? "100%" : "78%", padding:"5px", display:"inline-flex", justifyContent:"space-between"}}>
+                <TextField sx={{width:"48%"}} value={slotName} onChange={e => setSlotName(e.target.value)} />
+
+            <Box sx={{width:"48%"}}>
                 <Select
                     value={selectedUser}
                     onChange={(e) => setSelectedUser(e.target.value)}
@@ -67,17 +78,21 @@ const SlotManagement = (props) => {
                     ))}
                 </Select>
             </Box>
-            <Box sx={{width:"20%", display:"flex", justifyContent:"space-evenly"}}>
+            </Box>
+            <Box sx={{width: mobile? "100%":"20%", display:"flex", justifyContent: mobile? "flex-end" : undefined}}>
+                <Box sx={{gap:"2%",display:"flex", justifyContent:"space-evenly", width: mobile? undefined : "100%"}}>
                 <Tooltip title="Upravit">
-                <IconButton color="primary" onClick={update}>
+                    <IconButton color="primary" onClick={update}>
                     <CheckCircleIcon />
                 </IconButton>
                 </Tooltip>
-                <Tooltip title="Smazat">
+                    <Tooltip title="Smazat">
+
                 <IconButton color="primary" onClick={del}>
                     <DeleteIcon />
                 </IconButton>
-                </Tooltip>
+                        </Tooltip>
+                </Box>
             </Box>
         </Box>
     )

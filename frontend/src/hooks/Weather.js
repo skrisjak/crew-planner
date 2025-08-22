@@ -1,6 +1,7 @@
 import { fetchWeatherApi } from 'openmeteo';
 import {create} from "zustand/react";
 import CONF from "../api/CONF";
+import dayjs from "dayjs";
 
 export const useWeather = create( (set)=> ({
     weatherData: null,
@@ -19,16 +20,22 @@ export const useWeather = create( (set)=> ({
         const daily = response.daily();
 
         const weatherData = {
-            daily: {
-                time: [...Array((Number(daily.timeEnd()) - Number(daily.time())) / daily.interval())].map(
+            time: [...Array((Number(daily.timeEnd()) - Number(daily.time())) / daily.interval())].map(
                     (_, i) => new Date((Number(daily.time()) + i * daily.interval()) * 1000)
-                ),
-                weather_code: daily.variables(0).valuesArray(),
-                temperature_2m_max: daily.variables(1).valuesArray(),
-            },
+            ),
+            weather_code: daily.variables(0).valuesArray(),
+            temperature_2m_max: daily.variables(1).valuesArray(),
         };
 
-        set({ weatherData: daily });
-        console.log("\nDaily data", weatherData.daily);
+        const weather = new Map();
+
+        weatherData.time.forEach(((day, index) => {
+            weather.set(dayjs(day).format("YYYY-MM-DD"), {
+                code: weatherData.weather_code[index],
+                temperature: weatherData.temperature_2m_max[index]
+            })
+        }))
+
+        set({ weatherData: weather });
     }
 }));
