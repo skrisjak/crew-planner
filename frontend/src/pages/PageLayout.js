@@ -27,7 +27,7 @@ function PageLayout(props) {
     }, [loadProfile]);
 
     return (
-        <Box container sx={{backgroundColor:"#f8fafd", height:"100vh",width:"100%", maxWidth:"100%", overflow:"hidden"}}>
+        <Box container sx={{backgroundColor:"#f8fafd", height:"100svh",width:"100%", maxWidth:"100%", overflow:"hidden"}}>
             <Box sx={{flexShrink:0,padding:"10px", display:"flex", justifyContent:"space-between", flexDirection:"row", alignItems:"center", height:"auto", minWidth:"100%",  maxWidth:"100%", boxSizing: "border-box", maxHeight: mobile? "10%": null}}>
                 <Box sx={{display:"inline-flex", alignItems:'center'}}>
                     {mobile ?
