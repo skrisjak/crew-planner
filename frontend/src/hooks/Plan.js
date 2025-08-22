@@ -1,55 +1,54 @@
-import {useEffect, useState} from "react";
 import API from "../api/API";
 import dayjs from "dayjs";
-import {useNavigate} from "react-router-dom";
+import {create} from "zustand/react";
 
-export const usePlan = () => {
-    const redirect = useNavigate();
-    const [loading, setLoading] = useState(true);
-    const [plans, setPlans] = useState(new Map());
-    const [selectedDate, setSelectedDate] = useState(dayjs());
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
-    const [plan, setPlan] = useState(null);
+export const usePlan = create((set, get) => ({
+    loading: true,
+    plans: new Map(),
+    selectedDate: dayjs(),
+    startDate: null,
+    endDate: null,
+    plan: null,
 
-    const getPlan = async () => {
+    getPlan: async () => {
         try {
             const newPlan = await API.getWeekPlan();
-            setPlan(newPlan.workDays);
-            setLoading(false);
-            setStartDate(dayjs(newPlan.startDate));
-            setEndDate(dayjs(newPlan.endDate));
 
-            setPlans(prevPlans => {
-                const newPlans = new Map(prevPlans);
-                newPlan.workDays.forEach(plan => {
-                    newPlans.set(dayjs(plan.date).format("YYYY-MM-DD"), plan);
+            set({
+                plan: newPlan.workDays,
+                loading: false,
+                startDate: dayjs(newPlan.startDate),
+                endDate: dayjs(newPlan.endDate),
+            });
+
+            set(state => {
+                const newPlans = new Map(state.plans);
+                newPlan.workDays.forEach(p => {
+                    newPlans.set(dayjs(p.date).format("YYYY-MM-DD"), p);
                 });
-                return newPlans;
+                return { plans: newPlans };
             });
 
         } catch (error) {
             alert(error.message);
         }
-    };
+    },
 
-    useEffect(() => {
-        getPlan();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    const updatePlan = async (date) => {
+    updatePlan: async (date) => {
+        const { startDate, endDate, plans } = get();
 
         if (!date.isBefore(startDate) && !date.isAfter(endDate)) {
-            setSelectedDate(date);
+            set({ selectedDate: date });
         } else {
-            setLoading(true);
+            set({ loading: true });
 
             const newStartDate = dayjs(date).add(-2, "day").isBefore(startDate) ? dayjs(date).add(-2, "day") : startDate;
             const newEndDate = dayjs(date).add(7, "day").isAfter(endDate) ? dayjs(date).add(7, "day") : endDate;
 
-            setStartDate(newStartDate);
-            setEndDate(newEndDate);
+            set({
+                startDate: newStartDate,
+                endDate: newEndDate,
+            });
 
             try {
                 const updatedPlan = await API.getPlan(newStartDate, newEndDate);
@@ -59,43 +58,36 @@ export const usePlan = () => {
                     newPlans.set(dayjs(p.date).format("YYYY-MM-DD"), p);
                 });
 
-                setPlans(newPlans);
-                setPlan(updatedPlan.workDays);
-                setLoading(false);
-                setSelectedDate(date);
-            } catch (error) {
-                if (error.message === "Unauthorized") {
-                    redirect("/#error=Unauthorized");
-                }
+                set({
+                    plans: newPlans,
+                    plan: updatedPlan.workDays,
+                    loading: false,
+                    selectedDate: date,
+                });
+
+            } catch (e) {
+                alert(e.message);
             }
         }
-    }
+    },
 
-    const refreshPlan = async () => {
+    refreshPlan: async () => {
+        const { startDate, endDate, plans } = get();
         try {
-            setLoading(true);
+            set({ loading: true });
             const rsp = await API.getPlan(startDate, endDate);
             const newPlans = new Map(plans);
             rsp.workDays.forEach(p => {
                 newPlans.set(dayjs(p.date).format("YYYY-MM-DD"), p);
             });
 
-            setPlans(newPlans);
-            setPlan(rsp.workDays);
-            setLoading(false);
+            set({
+                plans: newPlans,
+                plan: rsp.workDays,
+                loading: false,
+            });
         } catch (error) {
             alert(error.message);
         }
-    }
-
-    useEffect(() => {
-        setTimeout( () => {
-            const element = document.getElementById(selectedDate.format("YYYY-MM-DD"));
-                if (element) {
-                    element.scrollIntoView({behavior: "smooth", block:"nearest", inline:"center"});
-                }
-        },100);
-    }, [selectedDate]);
-
-    return {loading, plan, updatePlan, refreshPlan};
-}
+    },
+}));

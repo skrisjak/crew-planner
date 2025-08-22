@@ -16,7 +16,14 @@ import DefaultSlotManagement from "./components/DefaultSlotManagement";
 function Home() {
     const {mobile, fullScreen} =useResponsive();
     const [selectedDate, setSelectedDate] = useState(dayjs());
-    const {loading, plan, updatePlan, refreshPlan} = usePlan();
+
+    const loading = usePlan(state => state.loading);
+    const plan = usePlan(state => state.plan);
+    const getPlan = usePlan(state => state.getPlan);
+    const updatePlan = usePlan(state => state.updatePlan);
+    const refreshPlan = usePlan(state => state.refreshPlan);
+    const storeDate = usePlan(state => state.selectedDate);
+
     const [open, setOpen] = useState(false);
     const user = useProfile(set => set.profile);
     const users = useUsers(st => st.users);
@@ -42,6 +49,14 @@ function Home() {
     useEffect(() => {
         getWeatherData();
     }, [getWeatherData]);
+
+    useEffect(() => {
+        setTimeout( () => { const element = document.getElementById(storeDate.format("YYYY-MM-DD")); if (element) { element.scrollIntoView({behavior: "smooth", block:"nearest", inline:"center"}); } },100);
+    }, [storeDate]);
+
+    useEffect(() => {
+        getPlan();
+    }, [getPlan]);
 
     const refresh = async () => {
         await refreshPlan();
