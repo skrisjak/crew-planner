@@ -1,7 +1,6 @@
 package cz.skrisjak.crew_planner.data;
 
 import lombok.Data;
-
 import java.time.LocalDate;
 import java.util.List;
 

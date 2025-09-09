@@ -6,8 +6,7 @@ import lombok.Data;
 @Data
 public class ResponseShiftPlan {
     private Long id;
-    private String user;
-    private String image;
+    private ResponseUser user;
     private String note;
     private Availability availability;
 }

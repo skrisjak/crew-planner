@@ -54,8 +54,9 @@ public class PlanMapper {
     public static ResponseShiftPlan mapPlan(ShiftPlan shiftPlan) {
         ResponseShiftPlan rsp = new ResponseShiftPlan();
         rsp.setId(shiftPlan.getId());
-        rsp.setUser(shiftPlan.getUser().getNickName() != null ? shiftPlan.getUser().getNickName() : shiftPlan.getUser().getName());
-        rsp.setImage(shiftPlan.getUser().getImage());
+        if (shiftPlan.getUser() != null) {
+            rsp.setUser(UserMapper.map(shiftPlan.getUser()));
+        }
         rsp.setNote(shiftPlan.getNote());
         rsp.setAvailability(shiftPlan.getAvailability());
         return rsp;
@@ -79,15 +80,8 @@ public class PlanMapper {
         } else {
             rs.setSlotName(slot.getSlotName());
         }
-        User u = slot.getUser();
-
-        if (u != null) {
-            if (u.getNickName() != null && u.getNickName() != "") {
-                rs.setRegisteredWorkerName(u.getNickName());
-            } else {
-                rs.setRegisteredWorkerName(u.getName());
-            }
-            rs.setRegisteredWorkerImage(u.getImage());
+        if (slot.getUser() != null) {
+            rs.setUser(UserMapper.map(slot.getUser()));
         }
         return rs;
     }

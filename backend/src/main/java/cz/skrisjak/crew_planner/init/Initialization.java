@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Initialization {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public Initialization(UserRepository userRepository) {
