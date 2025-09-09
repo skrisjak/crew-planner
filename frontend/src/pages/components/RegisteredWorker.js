@@ -45,12 +45,8 @@ const RegisteredWorker =(props) => {
 
         let canAccess = false;
 
-        if (profile.nickName) {
-            if (profile.nickName === registeredWorker.user) {
-                canAccess = true;
-            }
-        } else {
-            if (profile.name === registeredWorker.user) {
+        if (profile) {
+            if (profile.email === registeredWorker.user.email) {
                 canAccess = true;
             }
         }
@@ -74,7 +70,7 @@ const RegisteredWorker =(props) => {
     return (
         <>
             <Tooltip title={<Box maxWidth="20vw">{registeredWorker.note}</Box>} open={toolTipOpen} onOpen={e=> hasNote && setToolTipOpen(true)} onClose={e => setToolTipOpen(false)} onClick={openDialog}>
-                <Chip avatar={<Avatar src={registeredWorker.image} />} variant="outlined" label={registeredWorker.user } deleteIcon={getIcon(registeredWorker.availability)} onDelete={openDialog} sx={{margin:"5px", ":hover":{scale:1.02}, "& .MuiChip-deleteIcon": {color:getColor(registeredWorker.availability)}, "& .MuiChip-deleteIcon:hover": {color:getColor(registeredWorker.availability)}}}/>
+                <Chip avatar={<Avatar src={registeredWorker.user.image} />} variant="outlined" label={registeredWorker.user.nickName? registeredWorker.user.nickName : registeredWorker.user.name } deleteIcon={getIcon(registeredWorker.availability)} onDelete={openDialog} sx={{margin:"5px", ":hover":{scale:1.02}, "& .MuiChip-deleteIcon": {color:getColor(registeredWorker.availability)}, "& .MuiChip-deleteIcon:hover": {color:getColor(registeredWorker.availability)}}}/>
             </Tooltip>
             <Dialog open={dialogOpen} onClose={e => {setDialogOpen(false); e.stopPropagation();}} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "80vw" : "50vw",minHeight: "50vh", maxHeight:"90vh", padding:"10px", boxSizing:"border-box", overflowY:"auto"}}} onClick={e => e.stopPropagation()}>
                 <RegisterShift updatable access={updatable} registeredWorker={registeredWorker} addWorker={addWorker} deleteWorker={props.deleteWorker}/>

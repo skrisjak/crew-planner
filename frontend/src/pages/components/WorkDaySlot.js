@@ -13,19 +13,17 @@ import {
 import {useProfile} from "../../hooks/UserProfile";
 import {useResponsive} from "../../hooks/Responsive";
 import {getFullDateText} from "../../util/days";
-import {useUsers} from "../../hooks/Users";
 import API from "../../api/API";
 import {usePlan} from "../../hooks/Plan";
+import {useUsers} from "../../hooks/Users";
 
 const WorkDaySlot = (props) => {
     const slot = props.slot;
     const [dialogOpen, setDialogOpen] = useState(false);
     const profile = useProfile(set => set.profile);
-    const users = useUsers(set => set.users);
+    const users = useUsers(st => st.users);
     const [selectedUser, setSelectedUser] = useState(
-        (users && slot.registeredWorkerName)
-            ? users.find(u => u.nickName === slot.registeredWorkerName || u.name === slot.registeredWorkerName)
-            : null
+        slot.user? slot.user.email : ""
     );
     const {refreshPlan} = usePlan();
 
@@ -51,8 +49,7 @@ const WorkDaySlot = (props) => {
             setDialogOpen(false);
             props.updateSlot(slot.id, {
                 ...slot,
-                registeredWorkerName: profile.nickName? profile.nickName : profile.name,
-                registeredWorkerImage: profile.image || "",
+                user: profile
             });
         } catch (error) {
             alert(error.message);
@@ -66,8 +63,7 @@ const WorkDaySlot = (props) => {
             setDialogOpen(false);
             props.updateSlot(slot.id, {
                 ...slot,
-                registeredWorkerName: null,
-                registeredWorkerImage: null,
+                user:null
             });
         } catch (error) {
             alert(error.message);
@@ -78,14 +74,13 @@ const WorkDaySlot = (props) => {
         if (selectedUser) {
             try {
                 await API.addUserToSlots({
-                    user: selectedUser.email,
+                    user: selectedUser,
                     slotId: slot.id
                 });
                 setDialogOpen(false);
                 props.updateSlot(slot.id, {
                     ...slot,
-                    registeredWorkerName: selectedUser? (selectedUser.nickName? selectedUser.nickName :selectedUser.name) : null,
-                    registeredWorkerImage: selectedUser ? (selectedUser.image ? selectedUser.image : "") : null,
+                    user: users.find(user => user.email === selectedUser),
                 });
             } catch (e) {
                 alert(e.message);
@@ -96,19 +91,19 @@ const WorkDaySlot = (props) => {
     }
 
     useEffect(() => {
-        setSelectedUser(users.find(u => (u.nickName === slot.registeredWorkerName || u.name === slot.registeredWorkerName)));
-    }, [slot, users]);
+        setSelectedUser(slot.user? slot.user.email : "");
+    }, [slot]);
 
     const {mobile} = useResponsive();
 
     return (
         <>
             <Chip
-                variant={slot.registeredWorkerName? undefined : "outlined"}
-                sx={{width:'100%', borderRadius:"5px", justifyContent:"start"}}
-                label={slot.slotName + " - " +(slot.registeredWorkerName? slot.registeredWorkerName :"volné místo")}
+                variant={slot.user? undefined : "outlined"}
+                sx={{width:'100%', borderRadius:"5px", justifyContent:"start", fontSize:"1em"}}
+                label={slot.slotName + " - " +(slot.user? (slot.user.nickName? slot.user.nickName: slot.user.name) :"volné místo")}
                 onClick={handleClick}
-                avatar={slot.registeredWorkerName? <Avatar src={slot.registeredWorkerImage? slot.registeredWorkerImage : ""}/> : undefined}
+                avatar={slot.user? <Avatar src={slot.user.image? slot.user.image : ""}/> : undefined}
             />
             <Dialog open={dialogOpen} onClose={handleClose} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "90vw" : "50vw",height: "50vh", padding:"10px", boxSizing:"border-box", overflowY:"auto"}}} onClick={e => e.stopPropagation()}>
                 <Box sx={{display:"inline-flex", justifyContent:"space-between"}}>
@@ -122,12 +117,12 @@ const WorkDaySlot = (props) => {
 
                 <Divider sx={{width:"100%", marginBottom:"10px"}}/>
 
-                {profile && ["EMPLOYEE", "ADMIN"].includes(profile.role) && (
+                {profile && profile.role ==="EMPLOYEE" && (
 
                     <Box sx={{width:'100%', display:"flex", flexDirection:"row-reverse", marginBottom:"10px"}}>
                         {
-                            (slot.registeredWorkerName === null || slot.registeredWorkerName === profile.name || slot.registeredWorkerName === profile.nickName) && (
-                                slot.registeredWorkerName ===  null ?
+                            (slot.user === null || slot.user.email === profile.email) && (
+                                slot.user ===  null ?
                                     <Button variant="contained" onClick={registerSlot}>Zapsat se</Button> :
                                     <Button variant="outlined" onClick={freeSlot}>Odhlásit se</Button>
 
@@ -144,14 +139,13 @@ const WorkDaySlot = (props) => {
                             label="Uživatel"
                             value={selectedUser}
                             onChange={(e) => setSelectedUser(e.target.value)}
-                            options={users}
                             sx={{width:"100%"}}
                         >
-                            <MenuItem value={null}>
+                            <MenuItem value="">
                                 Nikdo
                             </MenuItem>
                             {users.map(option => (
-                                <MenuItem value={option}>
+                                <MenuItem value={option.email}>
                                     <Box component="li" {...props} sx={{ display: "flex", alignItems: "center" }}>
                                     <Avatar
                                     src={option.image}

@@ -127,6 +127,10 @@ class API {
     static removeUserFromSlot = async (slotId) => {
         return await API.doRequest("plan/slot/user?slotId=" + slotId, "DELETE");
     }
+
+    static subscribe = async (pushSubscription) => {
+        return await API.doRequest("subscribe", "POST", pushSubscription);
+    }
 }
 
 export default API;

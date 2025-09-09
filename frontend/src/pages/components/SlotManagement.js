@@ -11,9 +11,7 @@ const SlotManagement = (props) => {
     const {mobile} = useResponsive();
     const users = useUsers(s=> s.users);
     const [selectedUser, setSelectedUser] = useState(
-        (users && slot.registeredWorkerName)
-            ? users.find(u => u.nickName === slot.registeredWorkerName || u.name === slot.registeredWorkerName)
-            : null
+        slot.user
     );
     const [slotName, setSlotName] = useState(slot.slotName);
 
@@ -22,10 +20,7 @@ const SlotManagement = (props) => {
             const updatedSlot = {
                 ...slot,
                 slotName: slotName,
-                registeredWorkerName: selectedUser
-                    ? (selectedUser.nickName ? selectedUser.nickName : selectedUser.name)
-                    : null,
-                registeredWorkerImage: selectedUser ? (selectedUser.image ? selectedUser.image : "") : null,
+                user: selectedUser,
             };
 
             await API.updateSlot({
@@ -58,15 +53,15 @@ const SlotManagement = (props) => {
 
             <Box sx={{width:"48%"}}>
                 <Select
-                    value={selectedUser}
-                    onChange={(e) => setSelectedUser(e.target.value)}
+                    value={selectedUser? selectedUser.email : ""}
+                    onChange={(e) => setSelectedUser(users.find(u => u.email === e.target.value) ||"")}
                     sx={{width:"100%"}}
                 >
-                    <MenuItem value={null}>
+                    <MenuItem value="">
                         Nikdo
                     </MenuItem>
                     {users.map(option => (
-                        <MenuItem value={option}>
+                        <MenuItem value={option.email}>
                             <Box sx={{ display: "flex", alignItems: "center" }}>
                                 <Avatar
                                     src={option.image}
@@ -88,7 +83,7 @@ const SlotManagement = (props) => {
                 </Tooltip>
                     <Tooltip title="Smazat">
 
-                <IconButton color="primary" onClick={del}>
+                <IconButton color="error" onClick={del}>
                     <DeleteIcon />
                 </IconButton>
                         </Tooltip>

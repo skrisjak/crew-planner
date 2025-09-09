@@ -12,6 +12,8 @@ import React, {useEffect, useState} from "react";
 import {useProfile} from "../hooks/UserProfile";
 import {useResponsive} from "../hooks/Responsive";
 import {useNavigate} from "react-router-dom";
+import CONF from "../api/CONF";
+import API from "../api/API";
 
 
 function PageLayout(props) {
@@ -25,6 +27,31 @@ function PageLayout(props) {
     useEffect(() => {
         loadProfile();
     }, [loadProfile]);
+
+    useEffect(() => {
+        const registerNotification = async () => {
+
+            try {
+                const permission = await Notification.requestPermission();
+
+                const rsp = await fetch(CONF.origin+"vapidKey");
+                const key = await rsp.text();
+
+                const swReg = await navigator.serviceWorker.register('/sw.js');
+
+                const subscription = await swReg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: key
+                });
+
+                await API.subscribe(subscription);
+            } catch (e) {
+                return;
+            }
+
+        };
+        registerNotification();
+    }, []);
 
     return (
         <Box container sx={{backgroundColor:"#f8fafd", height:"100svh",width:"100%", maxWidth:"100%", overflow:"hidden"}}>
@@ -69,7 +96,7 @@ function PageLayout(props) {
                                     <ListItemText>Hodiny</ListItemText>
                                 </ListItemButton>
                             </ListItem>
-                            <ListItem key="shoplist" sx={{padding:0, margin:0}}>
+                            <ListItem key="shoplist" sx={{padding:0, margin:0}} onClick={()=> redirect("/shopList")}>
                                 <ListItemButton>
                                     Nákup
                                 </ListItemButton>
@@ -105,7 +132,7 @@ function PageLayout(props) {
                                 </ListItemButton>
                             </ListItem>
 
-                            <ListItem key="shoplist" sx={{padding:0, margin:0}}>
+                            <ListItem key="shoplist" sx={{padding:0, margin:0}} onClick={()=> redirect("/shopList")}>
                                 <ListItemButton>
                                     Nákup
                                 </ListItemButton>
