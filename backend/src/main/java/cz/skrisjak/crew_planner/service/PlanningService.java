@@ -27,9 +27,11 @@ public class PlanningService {
     private final DefaultSlotRepository defaultSlotRepository;
     private final WorkDaySlotRepository slotRepository;
     private final WorkDayRepository workDayRepository;
+    private final SubscriptionService subscriptionService;
+
 
     @Autowired
-    public PlanningService(WorkDayRepository repository, WorkDayNoteRepository noteRepository, ShiftPlanRepository shiftPlanRepository, UserRepository userRepository, DefaultSlotRepository defaultSlotRepository, WorkDaySlotRepository slotRepository, WorkDayRepository workDayRepository) {
+    public PlanningService(WorkDayRepository repository, WorkDayNoteRepository noteRepository, ShiftPlanRepository shiftPlanRepository, UserRepository userRepository, DefaultSlotRepository defaultSlotRepository, WorkDaySlotRepository slotRepository, WorkDayRepository workDayRepository, SubscriptionService subscriptionService) {
         this.repository = repository;
         this.noteRepository = noteRepository;
         this.shiftPlanRepository = shiftPlanRepository;
@@ -37,6 +39,7 @@ public class PlanningService {
         this.defaultSlotRepository = defaultSlotRepository;
         this.slotRepository = slotRepository;
         this.workDayRepository = workDayRepository;
+        this.subscriptionService = subscriptionService;
     }
 
     public List<WorkDay> getWeekPlan() {
@@ -173,7 +176,7 @@ public class PlanningService {
         defaultSlotRepository.save(update);
     }
 
-    public WorkDaySlot createSlot(PostSlot postSlot) {
+    public WorkDaySlot createSlot(PostSlot postSlot, User author) {
         WorkDaySlot workDaySlot = new WorkDaySlot();
         workDaySlot.setSlotName(postSlot.getSlotName());
         if (postSlot.getUser() != null) {
@@ -182,6 +185,7 @@ public class PlanningService {
         if (postSlot.getWorkDayId() != null) {
             workDaySlot.setWorkDay(workDayRepository.findById(postSlot.getWorkDayId()).orElseThrow());
         }
+        subscriptionService.notifyPlanChange(author);
         return slotRepository.save(workDaySlot);
     }
 
@@ -189,10 +193,12 @@ public class PlanningService {
         WorkDaySlot workDaySlot = slotRepository.findById(updatedSlot.getId()).orElseThrow();
         workDaySlot.setSlotName(updatedSlot.getSlotName());
         workDaySlot.setUser(userRepository.findByEmail(updatedSlot.getUser()).orElse(null));
+        subscriptionService.notifySlotChange(workDaySlot);
         slotRepository.save(workDaySlot);
     }
     public void deleteSlot(Long slotId) {
         WorkDaySlot slot = slotRepository.findById(slotId).orElseThrow();
+        subscriptionService.notifySlotChange(slot);
         slotRepository.delete(slot);
     }
 
@@ -200,6 +206,7 @@ public class PlanningService {
         User user= userRepository.findByEmail(slot.getUser()).orElseThrow();
         WorkDaySlot workSlot = slotRepository.findById(slot.getSlotId()).orElseThrow();
         workSlot.setUser(user);
+        subscriptionService.notifySlotChange(workSlot);
         slotRepository.save(workSlot);
     }
 

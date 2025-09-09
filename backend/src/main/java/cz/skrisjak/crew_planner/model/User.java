@@ -1,5 +1,6 @@
 package cz.skrisjak.crew_planner.model;
 
+import cz.skrisjak.crew_planner.model.subscription.PushSubscription;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
@@ -24,4 +25,5 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<ShiftPlan> shiftPlans = new ArrayList<>();
+
 }

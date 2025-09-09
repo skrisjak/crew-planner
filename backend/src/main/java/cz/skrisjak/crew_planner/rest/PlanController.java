@@ -2,16 +2,14 @@ package cz.skrisjak.crew_planner.rest;
 
 import cz.skrisjak.crew_planner.data.*;
 import cz.skrisjak.crew_planner.mapper.PlanMapper;
-import cz.skrisjak.crew_planner.model.DefaultSlot;
-import cz.skrisjak.crew_planner.model.ShiftPlan;
-import cz.skrisjak.crew_planner.model.WorkDay;
-import cz.skrisjak.crew_planner.model.WorkDaySlot;
+import cz.skrisjak.crew_planner.model.*;
 import cz.skrisjak.crew_planner.service.PlanningService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
@@ -137,9 +135,9 @@ public class PlanController {
     }
 
     @PostMapping(path="/slot")
-    public ResponseEntity<ResponseSlot> createSlot(@RequestBody PostSlot slot) {
+    public ResponseEntity<ResponseSlot> createSlot(@RequestBody PostSlot slot, @AuthenticationPrincipal User user) {
         try {
-            return ResponseEntity.ok(PlanMapper.mapSlot(planningService.createSlot(slot)));
+            return ResponseEntity.ok(PlanMapper.mapSlot(planningService.createSlot(slot, user)));
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
