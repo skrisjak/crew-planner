@@ -28,31 +28,6 @@ function PageLayout(props) {
         loadProfile();
     }, [loadProfile]);
 
-    useEffect(() => {
-        const registerNotification = async () => {
-
-            try {
-                const permission = await Notification.requestPermission();
-
-                const rsp = await fetch(CONF.origin+"vapidKey");
-                const key = await rsp.text();
-
-                const swReg = await navigator.serviceWorker.register('/sw.js');
-
-                const subscription = await swReg.pushManager.subscribe({
-                    userVisibleOnly: true,
-                    applicationServerKey: key
-                });
-
-                await API.subscribe(subscription);
-            } catch (e) {
-                return;
-            }
-
-        };
-        registerNotification();
-    }, []);
-
     return (
         <Box container sx={{backgroundColor:"#f8fafd", height:"100svh",width:"100%", maxWidth:"100%", overflow:"hidden"}}>
             <Box sx={{flexShrink:0,padding:"10px", display:"flex", justifyContent:"space-between", flexDirection:"row", alignItems:"center", height:"auto", minWidth:"100%",  maxWidth:"100%", boxSizing: "border-box", maxHeight: mobile? "10%": null}}>

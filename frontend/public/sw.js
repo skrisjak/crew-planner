@@ -1,23 +1,18 @@
 self.addEventListener('push', event => {
-    let data = { title: 'Nová notifikace', body: '' };
-
+    let message = "";
     if (event.data) {
-        try {
-            data = event.data.json();
-        } catch (e) {
-            data.body = event.data.text();
-        }
+        message = event.data.text();
+
     }
 
     const options = {
-        body: data.body,
-        icon: data.icon || '/icons/default-icon.png',
-        badge: data.badge || '/icons/badge.png',
-        data: data.url || '/home'
-    };
+        badge: "/logo192.png",
+        image:"/logo192.png",
+        body:message
+    }
 
     event.waitUntil(
-        self.registration.showNotification(data.title, options)
+        self.registration.showNotification("Beach směny", options)
     );
 });
 

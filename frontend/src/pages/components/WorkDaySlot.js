@@ -100,7 +100,7 @@ const WorkDaySlot = (props) => {
         <>
             <Chip
                 variant={slot.user? undefined : "outlined"}
-                sx={{width:'100%', borderRadius:"5px", justifyContent:"start", fontSize:"1em"}}
+                sx={{width:'100%', borderRadius:"5px", justifyContent:"start", fontSize:"0.85em"}}
                 label={slot.slotName + " - " +(slot.user? (slot.user.nickName? slot.user.nickName: slot.user.name) :"volné místo")}
                 onClick={handleClick}
                 avatar={slot.user? <Avatar src={slot.user.image? slot.user.image : ""}/> : undefined}

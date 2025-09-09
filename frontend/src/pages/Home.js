@@ -12,6 +12,8 @@ import {useWeather} from "../hooks/Weather";
 import {useUsers} from "../hooks/Users";
 import {useProfile} from "../hooks/UserProfile";
 import DefaultSlotManagement from "./components/DefaultSlotManagement";
+import CONF from "../api/CONF";
+import API from "../api/API";
 
 function Home() {
     const {mobile, fullScreen} =useResponsive();
@@ -58,6 +60,39 @@ function Home() {
         getPlan();
     }, [getPlan]);
 
+
+    useEffect(() => {
+        const registerNotification = async () => {
+            if (!user) return;
+
+            try {
+                const permission = await Notification.requestPermission();
+                if (permission !== "granted") return;
+
+
+                const rsp = await fetch(CONF.origin + "vapidKey");
+                const key = await rsp.text();
+
+                const swReg = await navigator.serviceWorker.register('/sw.js');
+
+
+                let subscription = await swReg.pushManager.getSubscription();
+                if (!subscription) {
+                    subscription = await swReg.pushManager.subscribe({
+                        userVisibleOnly: true,
+                        applicationServerKey: key
+                    });
+                }
+
+                await API.subscribe(subscription);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        registerNotification();
+    }, [user]);
+    
     const refresh = async () => {
         await refreshPlan();
     }
