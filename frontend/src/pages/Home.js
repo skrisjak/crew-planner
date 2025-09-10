@@ -6,12 +6,13 @@ import "dayjs/locale/cs";
 import dayjs from "dayjs";
 import {useResponsive} from "../hooks/Responsive";
 import {usePlan} from "../hooks/Plan";
-import {Box, CircularProgress} from "@mui/material";
+import {Box, CircularProgress, IconButton} from "@mui/material";
 import WorkDay from "./components/WorkDay";
 import {useWeather} from "../hooks/Weather";
 import {useUsers} from "../hooks/Users";
 import {useProfile} from "../hooks/UserProfile";
 import DefaultSlotManagement from "./components/DefaultSlotManagement";
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import CONF from "../api/CONF";
 import API from "../api/API";
 
@@ -60,43 +61,43 @@ function Home() {
         getPlan();
     }, [getPlan]);
 
+    const registerNotification = async () => {
+        if (!user) return;
+
+        try {
+
+            if (!("notification" in navigator) || !("serviceworker" in navigator)) {
+                return;
+            }
+
+            const permission = await Notification.requestPermission();
+            if (permission !== "granted") {
+                return;
+            }
+
+            const swReg = await navigator.serviceWorker.register('/sw.js');
+
+
+            let subscription = await swReg.pushManager.getSubscription();
+            if (!subscription) {
+
+                const rsp = await fetch(CONF.origin + "vapidKey");
+                const key = await rsp.text();
+
+                subscription = await swReg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: key
+                });
+            }
+
+            await API.subscribe(subscription);
+        } catch (e) {
+            console.error(e);
+        }
+    };
+
 
     useEffect(() => {
-        const registerNotification = async () => {
-            if (!user) return;
-
-            try {
-
-                if (!("notification" in navigator) || !("serviceworker" in navigator)) {
-                    return;
-                }
-
-                const permission = await Notification.requestPermission();
-                if (permission !== "granted") {
-                    return;
-                }
-
-                const swReg = await navigator.serviceWorker.register('/sw.js');
-
-
-                let subscription = await swReg.pushManager.getSubscription();
-                if (!subscription) {
-
-                    const rsp = await fetch(CONF.origin + "vapidKey");
-                    const key = await rsp.text();
-
-                    subscription = await swReg.pushManager.subscribe({
-                        userVisibleOnly: true,
-                        applicationServerKey: key
-                    });
-                }
-
-                await API.subscribe(subscription);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
         registerNotification();
     }, [user]);
     
@@ -125,7 +126,12 @@ function Home() {
                             <MobileDatePicker value={selectedDate} onChange={updateCalenderView} open={open} onOpen={()=> setOpen(true)}/>
                         </LocalizationProvider>
                         {user && ["ADMIN", "MANAGER"].includes(user.role) &&
+                            <>
                             <DefaultSlotManagement refreshPlan={refresh}/>
+                            <IconButton>
+                                <NotificationsIcon onClick={registerNotification}/>
+                            </IconButton>
+                            </>
                         }
                     </Box>
                     <Box sx={{boxSizing:"border-box", display:"block", flexDirection:"column", alignItems:"stretch", alignContent:"flex-start", height:"90%", overflow:"auto", padding:"10px"}}>
