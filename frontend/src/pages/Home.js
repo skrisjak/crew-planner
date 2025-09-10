@@ -66,8 +66,15 @@ function Home() {
             if (!user) return;
 
             try {
+
+                if (!("notification" in navigator) || !("serviceworker" in navigator)) {
+                    return;
+                }
+
                 const permission = await Notification.requestPermission();
-                if (permission !== "granted") return;
+                if (permission !== "granted") {
+                    return;
+                }
 
                 const swReg = await navigator.serviceWorker.register('/sw.js');
 
