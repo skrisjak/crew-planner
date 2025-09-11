@@ -9,6 +9,7 @@ import jakarta.annotation.PostConstruct;
 import nl.martijndwars.webpush.Notification;
 import nl.martijndwars.webpush.PushService;
 import nl.martijndwars.webpush.Subscription;
+import org.apache.http.HttpResponse;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.jose4j.lang.JoseException;
 import org.slf4j.Logger;
@@ -79,7 +80,10 @@ public class SubscriptionService {
             for (PushSubscription subscription : subscriptions) {
                 if (userFilter.test(subscription.getUser())) {
                     try {
-                        pushService.send(new Notification(new Subscription(subscription.getEndpoint(), new Subscription.Keys(subscription.getKeys().getP256dh(), subscription.getKeys().getAuth())), payload.toString()));
+                        HttpResponse response = pushService.send(new Notification(new Subscription(subscription.getEndpoint(), new Subscription.Keys(subscription.getKeys().getP256dh(), subscription.getKeys().getAuth())), payload.toString()));
+                        if (response.getStatusLine().getStatusCode() != 201) {
+                            LOG.warn("Notification failed: {}", response.getStatusLine().toString());
+                        }
                     } catch (GeneralSecurityException | IOException | ExecutionException | InterruptedException |
                              JoseException e) {
                         LOG.warn(e.getMessage());
