@@ -66,7 +66,7 @@ function Home() {
 
         try {
 
-            if (!("notification" in navigator) || !("serviceworker" in navigator)) {
+            if (!("Notification" in window) || !("serviceworker" in navigator)) {
                 return;
             }
 

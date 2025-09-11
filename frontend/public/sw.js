@@ -6,8 +6,7 @@ self.addEventListener('push', event => {
     }
 
     const options = {
-        badge: "/logo192.png",
-        image:"/logo192.png",
+        icon: "logo192.png",
         body:message
     }
 
