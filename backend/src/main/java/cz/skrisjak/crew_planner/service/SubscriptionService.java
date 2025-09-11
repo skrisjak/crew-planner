@@ -82,7 +82,7 @@ public class SubscriptionService {
                     try {
                         HttpResponse response = pushService.send(new Notification(new Subscription(subscription.getEndpoint(), new Subscription.Keys(subscription.getKeys().getP256dh(), subscription.getKeys().getAuth())), payload.toString()));
                         if (response.getStatusLine().getStatusCode() != 201) {
-                            LOG.warn("Notification failed: {}", response.getStatusLine().toString());
+                            LOG.warn("Notification failed: {}", response.getStatusLine().toString() + "\n" + response.getEntity().toString());
                         }
                     } catch (GeneralSecurityException | IOException | ExecutionException | InterruptedException |
                              JoseException e) {

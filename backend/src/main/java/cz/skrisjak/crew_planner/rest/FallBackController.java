@@ -1,5 +1,6 @@
 package cz.skrisjak.crew_planner.rest;
 
+import cz.skrisjak.crew_planner.data.PushSubSend;
 import cz.skrisjak.crew_planner.model.subscription.PushSubscription;
 import cz.skrisjak.crew_planner.model.User;
 import cz.skrisjak.crew_planner.service.SubscriptionService;
@@ -39,8 +40,12 @@ public class FallBackController {
 
     @PostMapping("/subscribe")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Void> subscribe(@RequestBody PushSubscription subscription, @AuthenticationPrincipal User user) {
-        subscriptionService.subscribe(subscription, user);
+    public ResponseEntity<Void> subscribe(@RequestBody PushSubSend subscription, @AuthenticationPrincipal User user) {
+        System.out.println();
+        System.out.println(subscription);
+        System.out.println();
+
+        subscriptionService.subscribe(subscription.getSubscription(), user);
         return ResponseEntity.ok().build();
     }
 }
