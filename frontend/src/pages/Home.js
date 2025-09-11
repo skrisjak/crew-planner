@@ -91,7 +91,7 @@ function Home() {
                 });
             }
 
-            await API.subscribe(subscription);
+            await API.subscribe({subscription:subscription, stringy: JSON.stringify(subscription)});
         } catch (e) {
             console.error(e);
         }

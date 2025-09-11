@@ -2,7 +2,6 @@ self.addEventListener('push', event => {
     let message = "";
     if (event.data) {
         message = event.data.text();
-
     }
 
     const options = {
