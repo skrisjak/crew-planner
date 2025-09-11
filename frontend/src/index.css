@@ -27,5 +27,10 @@ code {
 }
 
 @media screen and (display-mode: standalone) {
-    /*todo*/
+    body {
+        min-height: 100vh;
+        max-height: 100vh;
+        min-width: 100vw;
+        max-width: 100vw;
+    }
 }
