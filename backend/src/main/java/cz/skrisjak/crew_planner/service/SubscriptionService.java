@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.Security;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -34,6 +35,8 @@ public class SubscriptionService {
 
     @Value("${vapid.private}")
     private String privateKey;
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd. MM.");
 
     private final PushSubscriptionRepository repository;
     private PushService pushService;
@@ -60,9 +63,9 @@ public class SubscriptionService {
         String slotName;
 
         if (slot.getSlotName() == null || (slot.getSlotName().isEmpty() && slot.getDefaultSlot() != null)) {
-            slotName = slot.getDefaultSlot().getSlotName() + slot.getWorkDay().getDate().toString();
+            slotName = slot.getDefaultSlot().getSlotName() + " " + slot.getWorkDay().getDate().format(formatter);
         } else {
-            slotName = slot.getSlotName() + slot.getWorkDay().getDate().toString();
+            slotName = slot.getSlotName() + " " + slot.getWorkDay().getDate().format(formatter);
         }
 
         if (slot.getUser() != null) {
