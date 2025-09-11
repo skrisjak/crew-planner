@@ -66,7 +66,8 @@ function Home() {
 
         try {
 
-            if (!("Notification" in window) || !("serviceworker" in navigator)) {
+            const supportsPush = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+            if (!supportsPush) {
                 return;
             }
 
