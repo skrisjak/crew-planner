@@ -12,8 +12,6 @@ import React, {useEffect, useState} from "react";
 import {useProfile} from "../hooks/UserProfile";
 import {useResponsive} from "../hooks/Responsive";
 import {useNavigate} from "react-router-dom";
-import CONF from "../api/CONF";
-import API from "../api/API";
 
 
 function PageLayout(props) {

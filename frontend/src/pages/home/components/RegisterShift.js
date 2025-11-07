@@ -1,8 +1,8 @@
 import {Box, Button, MenuItem, Select, TextField, Typography} from "@mui/material";
 import {useState} from "react";
-import {useResponsive} from "../../hooks/Responsive";
-import {useProfile} from "../../hooks/UserProfile";
-import API from "../../api/API";
+import {useResponsive} from "../../../hooks/Responsive";
+import {useProfile} from "../../../hooks/UserProfile";
+import API from "../../../api/API";
 
 
 const RegisterShift =(props) => {

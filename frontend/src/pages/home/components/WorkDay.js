@@ -5,12 +5,12 @@ import {
     Paper,
     Typography
 } from "@mui/material";
-import {getDateText} from "../../util/days";
-import {useResponsive} from "../../hooks/Responsive";
+import {getDateText} from "../../../util/days";
+import {useResponsive} from "../../../hooks/Responsive";
 import {useState} from "react";
 import dayjs from "dayjs";
-import {useProfile} from "../../hooks/UserProfile";
-import API from "../../api/API";
+import {useProfile} from "../../../hooks/UserProfile";
+import API from "../../../api/API";
 import WorkDayNote from "./WorkDayNote";
 import RegisteredWorker from "./RegisteredWorker";
 import AddNote from "./AddNote";

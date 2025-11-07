@@ -131,6 +131,34 @@ class API {
     static subscribe = async (pushSubscription) => {
         return await API.doRequest("subscribe", "POST", pushSubscription);
     }
+
+    static getItems = async () => {
+        return await API.doRequest("shopping");
+    }
+
+    static addCategory = async (category) => {
+        return await API.doRequest("shopping/category", "POST", category);
+    }
+
+    static updateCategory = async (category) => {
+        return await API.doRequest("shopping/category", "PUT", category);
+    }
+
+    static deleteCategory = async (categoryId) => {
+        return await API.doRequest("shopping/category/"+categoryId, "DELETE");
+    }
+
+    static addItem = async (item) => {
+        return await API.doRequest("shopping/item", "POST", item);
+    }
+
+    static updateItem = async (item) => {
+        return await API.doRequest("shopping/item", "PUT", item);
+    }
+
+    static deleteItem = async (itemId) => {
+        return await API.doRequest("shopping/item/"+itemId, "DELETE");
+    }
 }
 
 export default API;

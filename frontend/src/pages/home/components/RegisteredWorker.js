@@ -1,8 +1,8 @@
 import {Avatar, Box, Chip, Dialog, Tooltip} from "@mui/material";
 import {useState} from "react";
-import {useProfile} from "../../hooks/UserProfile";
+import {useProfile} from "../../../hooks/UserProfile";
 import RegisterShift from "./RegisterShift";
-import {useResponsive} from "../../hooks/Responsive";
+import {useResponsive} from "../../../hooks/Responsive";
 import AccessibilityIcon from '@mui/icons-material/Accessibility';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';

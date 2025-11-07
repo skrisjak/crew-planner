@@ -1,20 +1,20 @@
 import {useEffect, useState} from "react";
-import PageLayout from "./PageLayout";
+import PageLayout from "../PageLayout";
 import {DateCalendar, LocalizationProvider, MobileDatePicker} from "@mui/x-date-pickers";
 import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/cs";
 import dayjs from "dayjs";
-import {useResponsive} from "../hooks/Responsive";
-import {usePlan} from "../hooks/Plan";
+import {useResponsive} from "../../hooks/Responsive";
+import {usePlan} from "../../hooks/Plan";
 import {Box, CircularProgress, IconButton} from "@mui/material";
 import WorkDay from "./components/WorkDay";
-import {useWeather} from "../hooks/Weather";
-import {useUsers} from "../hooks/Users";
-import {useProfile} from "../hooks/UserProfile";
+import {useWeather} from "../../hooks/Weather";
+import {useUsers} from "../../hooks/Users";
+import {useProfile} from "../../hooks/UserProfile";
 import DefaultSlotManagement from "./components/DefaultSlotManagement";
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import CONF from "../api/CONF";
-import API from "../api/API";
+import CONF from "../../api/CONF";
+import API from "../../api/API";
 
 function Home() {
     const {mobile, fullScreen} =useResponsive();

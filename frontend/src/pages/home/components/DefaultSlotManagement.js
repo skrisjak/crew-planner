@@ -1,9 +1,9 @@
 import {Box, Button, Dialog, IconButton, TextField, Tooltip, Typography} from "@mui/material";
 
 import EditCalendarIcon from '@mui/icons-material/EditCalendar';
-import {useResponsive} from "../../hooks/Responsive";
+import {useResponsive} from "../../../hooks/Responsive";
 import {useEffect, useState} from "react";
-import API from "../../api/API";
+import API from "../../../api/API";
 import DefaultSlot from "./DefaultSlot";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 

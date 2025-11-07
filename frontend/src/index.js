@@ -2,11 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import {Route, BrowserRouter, Routes} from "react-router-dom";
-import Login from "./pages/Login";
-import Home from "./pages/Home";
-import Hours from "./pages/Hours";
-import Users from "./pages/Users";
-import ShopList from "./pages/ShopList";
+import Login from "./pages/login/Login";
+import Home from "./pages/home/Home";
+import Hours from "./pages/hours/Hours";
+import Users from "./pages/users/Users";
+import ShopList from "./pages/shopList/ShopList";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

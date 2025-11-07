@@ -1,10 +1,10 @@
 import {Avatar, Box, IconButton, MenuItem, Select, TextField, Tooltip, Typography} from "@mui/material";
-import {useUsers} from "../../hooks/Users";
+import {useUsers} from "../../../hooks/Users";
 import SlotManagement from "./SlotManagement";
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import {useResponsive} from "../../hooks/Responsive";
+import {useResponsive} from "../../../hooks/Responsive";
 import {useState} from "react";
-import API from "../../api/API";
+import API from "../../../api/API";
 
 const SlotsManagement = (props) => {
     const slots = props.slots;

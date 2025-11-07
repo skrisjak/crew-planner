@@ -1,10 +1,10 @@
-import PageLayout from "./PageLayout";
+import PageLayout from "../PageLayout";
 import {Autocomplete, Avatar, Box, Button, MenuItem, Select, TextField} from "@mui/material";
-import {useResponsive} from "../hooks/Responsive";
-import {useUsers} from "../hooks/Users";
+import {useResponsive} from "../../hooks/Responsive";
+import {useUsers} from "../../hooks/Users";
 import {useEffect, useState} from "react";
 import AddIcon from '@mui/icons-material/Add';
-import API from "../api/API";
+import API from "../../api/API";
 
 const ADD_USER="Přidat uživatele"
 

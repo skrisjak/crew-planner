@@ -10,12 +10,12 @@ import {
     Select,
     Typography
 } from "@mui/material";
-import {useProfile} from "../../hooks/UserProfile";
-import {useResponsive} from "../../hooks/Responsive";
-import {getFullDateText} from "../../util/days";
-import API from "../../api/API";
-import {usePlan} from "../../hooks/Plan";
-import {useUsers} from "../../hooks/Users";
+import {useProfile} from "../../../hooks/UserProfile";
+import {useResponsive} from "../../../hooks/Responsive";
+import {getFullDateText} from "../../../util/days";
+import API from "../../../api/API";
+import {usePlan} from "../../../hooks/Plan";
+import {useUsers} from "../../../hooks/Users";
 
 const WorkDaySlot = (props) => {
     const slot = props.slot;

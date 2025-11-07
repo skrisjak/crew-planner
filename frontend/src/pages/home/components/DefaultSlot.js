@@ -1,9 +1,9 @@
 import {Box, IconButton, TextField, Tooltip} from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import DeleteIcon from "@mui/icons-material/Delete";
-import {useResponsive} from "../../hooks/Responsive";
+import {useResponsive} from "../../../hooks/Responsive";
 import {useState} from "react";
-import API from "../../api/API";
+import API from "../../../api/API";
 
 const DefaultSlot = (props) => {
 

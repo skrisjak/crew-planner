@@ -1,5 +1,5 @@
 import {Box, Button, Divider, TextField, Typography} from "@mui/material";
-import {useResponsive} from "../../hooks/Responsive";
+import {useResponsive} from "../../../hooks/Responsive";
 import {useState} from "react";
 
 const AddNote = (props) => {

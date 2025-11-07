@@ -1,5 +1,5 @@
 import {Box, Tooltip, Typography} from "@mui/material";
-import {useWeather} from "../../hooks/Weather";
+import {useWeather} from "../../../hooks/Weather";
 import dayjs from "dayjs";
 
 const Weather = (props) => {

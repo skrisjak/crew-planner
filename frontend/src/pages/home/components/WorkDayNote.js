@@ -7,9 +7,9 @@ import {
 } from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import {useState} from "react";
-import {useResponsive} from "../../hooks/Responsive";
-import API from "../../api/API";
-import {useProfile} from "../../hooks/UserProfile";
+import {useResponsive} from "../../../hooks/Responsive";
+import API from "../../../api/API";
+import {useProfile} from "../../../hooks/UserProfile";
 
 const WorkDayNote = (props) => {
     const [note, setNote] = useState(props.note);

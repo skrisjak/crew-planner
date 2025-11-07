@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
-import CONF from "../api/CONF";
+import CONF from "../../api/CONF";
 import {Alert, Box, IconButton, Typography} from "@mui/material";
 
 function Login() {
