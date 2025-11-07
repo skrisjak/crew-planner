@@ -1,4 +1,7 @@
 package cz.skrisjak.crew_planner.repository;
 
-public interface ItemCategoryRepository {
+import cz.skrisjak.crew_planner.model.ItemCategory;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ItemCategoryRepository extends JpaRepository<ItemCategory, Long> {
 }
