@@ -3,6 +3,8 @@ package cz.skrisjak.crew_planner.repository;
 import cz.skrisjak.crew_planner.model.Item;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ItemRepository extends JpaRepository<Item, Long> {
+import java.util.List;
 
+public interface ItemRepository extends JpaRepository<Item, Long> {
+    List<Item> findByCategoryIsNull();
 }

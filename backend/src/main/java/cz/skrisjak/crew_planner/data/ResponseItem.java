@@ -10,4 +10,5 @@ public class ResponseItem {
     private Double quantity;
     private MeasureUnit unit;
     private ResponseCategory category;
+    private Long order;
 }

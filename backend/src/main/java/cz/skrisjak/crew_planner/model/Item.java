@@ -14,4 +14,6 @@ public class Item extends BasicEntity {
     private ShopCartItem shopCartItem;
     @ManyToOne
     private ItemCategory category;
+    @Column(name="sort")
+    private Long order;
 }

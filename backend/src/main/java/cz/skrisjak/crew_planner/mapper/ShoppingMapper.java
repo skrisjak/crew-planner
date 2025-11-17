@@ -11,6 +11,7 @@ public class ShoppingMapper {
         ResponseCategory responseCategory = new ResponseCategory();
         responseCategory.setName(category.getName());
         responseCategory.setId(category.getId());
+        responseCategory.setOrder(category.getOrder());
         return responseCategory;
     }
 
@@ -22,6 +23,7 @@ public class ShoppingMapper {
         if (item.getCategory() != null) {
             responseItem.setCategory(map(item.getCategory()));
         }
+        responseItem.setOrder(item.getOrder());
         responseItem.setId(item.getId());
         return responseItem;
     }

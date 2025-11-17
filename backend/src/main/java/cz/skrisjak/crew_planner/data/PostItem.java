@@ -10,4 +10,5 @@ public class PostItem {
     private MeasureUnit unit;
     private Double quantity;
     private Long categoryId;
+    private Long order;
 }
