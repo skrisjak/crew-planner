@@ -6,9 +6,9 @@ export const useUsers = create( set => ({
     updateUsers: async () => {
         try {
             const rsp = await API.getUsers();
-            set(prev => ({...prev, users: rsp}));
+            set({users: rsp});
         } catch (error) {
-
+            alert(error);
         }
     },
 }));
