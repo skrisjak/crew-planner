@@ -1,29 +1,34 @@
 import {Box, Divider, IconButton, Paper, TextField, Typography} from "@mui/material";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Item from "./Item";
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import DoneIcon from '@mui/icons-material/Done';
 import API from "../../../api/API";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Draggable from "../../dragDrop/Draggable";
-import DropArea from "../../dragDrop/DropArea";
 import {sortByOrder, useShopList} from "../../../hooks/ShopList";
+import {SortableContext, useSortable} from "@dnd-kit/sortable";
+import {CSS} from "@dnd-kit/utilities";
+import {useDndMonitor} from "@dnd-kit/core";
+import DropArea from "../../dragDrop/DropArea";
 
-const Category = ({category, editable, index}) => {
+const Category = ({category, editable}) => {
     const [updateName, setUpdateName] = useState(category.name);
     const [expanded, setExpanded] = useState(false);
+    const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: "cat"+category.id, disabled: !editable });
 
     const {
         updateCategory,
         removeCategory,
         items,
-        dropCategory,
-        setDropCategory,
-        dropIndex,
-        setDropIndex,
-        setDraggedCategory
     } = useShopList();
+
+    const [myItems, setMyItems] = useState([]);
+
+    useEffect(() => {
+        setMyItems(items.filter(item => item.category?.id === category.id));
+    }, [items])
+
     const update = async () => {
         try {
             await updateCategory( {
@@ -43,52 +48,32 @@ const Category = ({category, editable, index}) => {
         }
     }
 
-    const [insert, setInsert] = useState(0);
-
-    const onDragOverHandler = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.dataTransfer.getData("text/plain") === "item") {
-            if (dropCategory === null || dropCategory.id !== category.id) {
-                setDropCategory(category);
-            }
-
-            if (items.length === 0)  {
-                setInsert(3);
-            }
-
-        } else if (e.dataTransfer.getData("text/plain") === "category") {
-            const rect = e.currentTarget.getBoundingClientRect();
-            const offsetY = e.clientY - rect.top;
-            const newIndex = (offsetY < (rect.height / 2)) ? index : index+1;
-            const newInsert = (offsetY < (rect.height / 2))? 1 :2;
-            setInsert(newInsert);
-            if (newIndex !== dropIndex) {
-                setDropIndex(newIndex);
-            }
+    const [over, setOver] = useState(0);
+    useDndMonitor({
+            onDragMove: ({over, active})=> {
+                if (over?.id ==="cat"+category.id && over?.id !==active.id) {
+                    if (active.id.startsWith("item")) {
+                        setOver(1);
+                    }
+                    if (active.id.startsWith("cat")) {
+                        setOver(2);
+                    }
+                } else {
+                    setOver(0);
+                }
+            },
+            onDragEnd: () => {setOver(0)},
+            onDragCancel: () => {setOver(0)},
         }
-    }
-
-    const onDragExitHandler = (e) => {
-        e.preventDefault();
-        setInsert(0);
-    }
-
-    const onDropHandler = (e) => {
-        e.preventDefault();
-        setInsert(0);
-    }
-
-    const onDragStartHandler = (e) => {
-        e.stopPropagation();
-        e.dataTransfer.setData("text/plain", "category");
-        setDraggedCategory(category);
-    }
+    );
 
     return (
-        <Draggable draggable={editable} onDragOver={onDragOverHandler} onDrop={onDropHandler} onDragExit={onDragExitHandler} onDragStart={onDragStartHandler}>
-            {insert === 1 && <DropArea/>}
-            <Paper sx={{padding:"10px", marginBottom:"10px"}} >
+        <>
+            {over===2 && <DropArea/>}
+            <Paper sx={{padding:"10px", marginBottom:"10px"}} ref={setNodeRef} style={{
+                transform: CSS.Transform.toString(transform),
+                transition,
+            }} {...attributes} {...listeners}>
                 <Box sx={{display:"flex", flexDirection:"row", justifyContent:"space-between"}}>
                     {editable?
                         <TextField variant="outlined" value={updateName} onChange={(e) => setUpdateName(e.target.value)}/> :
@@ -109,20 +94,20 @@ const Category = ({category, editable, index}) => {
                         </IconButton>
                     }
                 </Box>
-                {insert===3 && <DropArea/>}
                 {(expanded || editable) &&
                     <>
                         <Divider sx={{width:'100%',}}/>
-                        {items
-                            .filter(item => item.category?.id === category.id)
-                            .sort(sortByOrder)
-                            .map((item, index) => (
-                                <Item item={item} editable={editable} key={item.id} index={index}/>
+                        {over===1 && <DropArea/>}
+                        <SortableContext items={items.map(item => "item"+item.id)}>
+                            {myItems
+                                .sort(sortByOrder)
+                                .map(item => (
+                                    <Item item={item} editable={editable} key={item.id}/>
                             ))}
+                        </SortableContext>
                     </>}
             </Paper>
-            {insert===2 && <DropArea/>}
-        </Draggable>
+        </>
     )
 }
 

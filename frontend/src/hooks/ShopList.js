@@ -30,12 +30,12 @@ export const useShopList = create((set, get) => ({
 
     addCategory: (category) => {
         const {categories} = get();
-        set({categories: [...categories, category]});
+        set({categories: [...categories, category].sort(sortByOrder)});
     },
 
     addItem: (item) => {
         const {items} = get();
-        set({items: [...items, item]});
+        set({items: [...items, item].sort(sortByOrder)});
     },
 
     removeCategory: (categoryId) => {
@@ -59,39 +59,21 @@ export const useShopList = create((set, get) => ({
         set({items: items.filter(item => item.id !== itemId)})
     },
 
-
-    //variables concerning drag&drop
-    draggedItem: null,
-    draggedCategory: null,
-
-    dropCategory: null,
-    dropIndex: 0,
-
-
-    updateCategory: async () => {
-        const {draggedCategory, dropIndex, categories} =  get();
+    updateCategory: async (category) => {
+        const {categories} =  get();
 
         try {
             set({
-                categories: categories.map(category => {
-                    if (category.id === draggedCategory.id) {
-                        return {...category, order: dropIndex};
+                categories: categories.map(c => {
+                    if (category.id === c.id) {
+                        return category;
                     }
 
-                    if (
-                        category.id !== draggedCategory.id &&
-                        category.order >= dropIndex
-                    ) {
-                        return {...category, order: category.order + 1};
-                    }
-
-                    return category;
-                }),
-                dropIndex: 0,
-                draggedCategory: null
+                    return c;
+                })
             });
 
-            await API.updateCategory({...draggedCategory, order: dropIndex});
+            await API.updateCategory(category);
         } catch (e) {
             alert(e);
         }
@@ -99,7 +81,7 @@ export const useShopList = create((set, get) => ({
 
 
     updateItem: async (updatedItem=null) => {
-        const { draggedItem, dropIndex, dropCategory, items} = get();
+        const {items} = get();
 
         try {
             if (updatedItem) {
@@ -108,64 +90,101 @@ export const useShopList = create((set, get) => ({
                         i.id === updatedItem.id ? updatedItem : i
                     )
                 });
-
                 await API.updateItem(updatedItem);
-            } else {
-                set({
-                    items: items.map(item => {
-                        if (item.id === draggedItem.id) {
-                            return {
-                                ...item,
-                                order: dropIndex,
-                                category: dropCategory
-                            };
-                        }
-
-                        if (
-                            item.id !== draggedItem.id &&
-                            item.category?.id === dropCategory?.id &&
-                            item.order >= dropIndex
-                        ) {
-                            return {
-                                ...item,
-                                order: item.order + 1
-                            };
-                        }
-
-                        return item;
-                    }),
-                    draggedItem: null,
-                    dropCategory: null,
-                    dropIndex: 0
-                });
-
-                await API.updateItem({
-                    ...draggedItem,
-                    order: dropIndex,
-                    categoryId: dropCategory?.id
-                });
             }
         } catch (e) {
             alert(e);
         }
     },
 
+    moveCategory: (categoryId, droppedAtId) => {
+        const {categories} = get();
+        const dragged = categories.find(e => e.id === categoryId);
+        const dropped = categories.find(d => d.id === droppedAtId);
 
-    setDraggedItem: (item) => {
-        set({draggedItem: item});
+        const dropIndex = dropped?.order || 0;
+
+        if (dragged) {
+            set({
+                categories: categories.map(cat => {
+                    let order = cat.order;
+                    if (cat.id === categoryId) {
+                        order = dropIndex;
+                    } else if (cat.order >= dropIndex) {
+                        order = cat.order + 1;
+                    }
+                    return {
+                        ...cat,
+                        order:order,
+                    }
+                })
+            });
+            API.updateCategory({...dragged, order: dropIndex}).catch(e => alert(e));
+        }
     },
 
-    setDraggedCategory: (category) => {
-        set({draggedCategory: category});
-    },
+    moveItem: (itemId, droppedAtId) => {
+        const {items, categories} = get();
+        const dragged =  items.find(it => it.id === itemId);
 
-    setDropIndex: (index) => {
-        set({dropIndex: index});
-    },
+        if (dragged) {
+            if (droppedAtId === "nullCat") {
+            set({
+                items: items.map(i => {
+                    if (i.id === itemId) {
+                        return {
+                            ...i,
+                            category: null,
+                            order: 0
+                        }
+                    } return i;
+                })});
+            API.updateItem({...dragged, category:null, categoryId:null, order:0}).then().catch(e => alert(e));
+            }
 
-    setDropCategory: (category) => {
-        set({dropCategory: category});
-    },
+            if (droppedAtId.startsWith("cat")) {
+                const id = Number(droppedAtId.replace("cat", ""));
+                const cat = categories.find(cat => cat.id === id);
+                set({
+                    items: items.map(i => {
+                        if (i.id === itemId) {
+                            return {
+                                ...i,
+                                order:0,
+                                category:cat
+                            }
+                        }
+                        return i;
+                    }
+                )
+            })
+                API.updateItem({...dragged, category:cat, categoryId:cat.id, order:0}).then().catch(e => alert(e));
+            }
+
+            if (droppedAtId.startsWith("item")) {
+                const id = Number(droppedAtId.replace("item", ""));
+                const insert = items.find(it => it.id === id);
+                set({
+                    items: items.map(i => {
+                        if (i.id === itemId) {
+                            return {
+                                ...i,
+                                order: insert.order,
+                                category:insert.category
+                            }
+                        }
+                        if (i.category?.id === insert.category?.id && i.order >= insert.order) {
+                            return {
+                                ...i,
+                                order: i.order+1
+                            }
+                        }
+                        return i;
+                    })
+                })
+                API.updateItem({...dragged, category:insert.category, categoryId:insert.category?.id, order:insert.order}).then().catch(e => alert(e));
+            }
+    }},
 
     //sending items for order
     shopCart: new Map(),

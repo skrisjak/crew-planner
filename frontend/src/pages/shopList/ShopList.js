@@ -8,11 +8,19 @@ import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import {useProfile} from "../../hooks/UserProfile";
 import Item from "./components/Item";
-import DropArea from "../dragDrop/DropArea";
 import {sortByOrder, useShopList} from "../../hooks/ShopList";
+import {DndContext, closestCenter, PointerSensor, useSensor, useSensors, useDndMonitor} from "@dnd-kit/core";
+import {SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
+
 
 
 const ShopList = () => {
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {distance: 5}
+        })
+    );
 
     const mobile = useResponsive();
     const profile = useProfile(st => st.profile);
@@ -24,14 +32,16 @@ const ShopList = () => {
         getShopList,
         addItem,
         addCategory,
-        updateItem,
-        updateCategory,
-        dropCategory,
-        setDropCategory
+        moveCategory,
+        moveItem,
     } = useShopList();
     useEffect(() => {
         getShopList();
-    }, []);
+    }, [getShopList]);
+
+    useEffect(() => {
+        console.table(categories)
+    }, [categories]);
 
     const [categoryName, setCategoryName] = useState("");
     const [categoryModal, setCategoryModal] = useState(false);
@@ -71,38 +81,41 @@ const ShopList = () => {
         } finally {
             setItemModal(false);
         }
-    }
+    };
 
-    const onDropHandler = (e) => {
-        e.preventDefault();
-        if (e.dataTransfer.getData("text/plain") === "item") {
-            updateItem().then();
-        } else if (e.dataTransfer.getData("text/plain") === "category") {
-            updateCategory().then();
+    const handleDragEnd = (event) => {
+        const {active, over} = event;
+        setEditable(true);
+        if (!over) return;
+        if (active.id.startsWith("cat") && over.id.startsWith("cat")) {
+            const draggedId = Number(active.id.replace("cat", ""));
+            const droppedAtId = Number(over.id.replace("cat", ""));
+            moveCategory(draggedId, droppedAtId);
         }
-        setDropArea(false);
-    }
 
-    const [dropArea, setDropArea] = useState(false);
-    const onDragOverHandler = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.dataTransfer.getData("text/plain") === "item") {
-            if (dropCategory) {
-                setDropCategory(null);
-            }
-            if (items.filter(it => it.category !== null).length ===0) {
-                setDropArea(true);
-            }
+        if (active.id.startsWith("item")) {
+            const draggedId = Number(active.id.replace("item", ""));
+            moveItem(draggedId, over.id);
         }
-    }
+    };
+
+    const handleDragMove =(e) => {
+        if (e.active.id.startsWith("cat")) {
+            setEditable(false);
+        }
+    };
+
+    const handleDragCancel =() => {
+        setEditable(true);
+    };
 
     return (
         <PageLayout>
             {loading ? (
                     <CircularProgress/>) :
                 (
-                    <Box onDrop={onDropHandler} onDragOver={onDragOverHandler} onDragExit={(e) => {setDropArea(false); e.stopPropagation()}} sx={{height:"100%"}}>
+                    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} onDragMove={handleDragMove} onDragCancel={handleDragCancel}>
+                    <Box sx={{paddingBottom: editable? "300px": undefined}}>
                         {profile && ["ADMIN", "MANAGER"].includes(profile.role) && (
                             <Box sx={{display:"flex", flexDirection:"row-reverse", gap:"10px", marginBottom:"10px", justifyContent:"space-between", paddingX:"10px"}}>
 
@@ -115,8 +128,8 @@ const ShopList = () => {
                                             Přidat kategorii
                                         </Button>
 
-                                        <Dialog open={categoryModal} onClose={()=>setCategoryModal(false)} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "90vw" : "50vw",minHeight: "50vh", maxHeight:"90vh", padding:"10px", boxSizing:"border-box", overflowY:"auto"}}}>
-                                            <TextField type="text" value={categoryName} onChange={(e) => setCategoryName(e.target.value)}/>
+                                        <Dialog open={categoryModal} onClose={()=>setCategoryModal(false)} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "90vw" : "50vw",minHeight: "50vh", maxHeight:"90vh", padding:"10px",gap: "10px", boxSizing:"border-box", overflowY:"auto"}}}>
+                                            <TextField type="text" value={categoryName} onChange={(e) => setCategoryName(e.target.value)} />
                                             <Button onClick={addCat} variant="contained">Přidat kategorii</Button>
                                         </Dialog>
 
@@ -124,7 +137,7 @@ const ShopList = () => {
                                         <Button startIcon={<AddIcon/>} sx={{}} onClick={()=>setItemModal(true)} variant="contained">
                                             Přidat položku
                                         </Button>
-                                        <Dialog open={itemModal} onClose={()=>setItemModal(false)} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "90vw" : "50vw",minHeight: "50vh", maxHeight:"90vh", padding:"10px", boxSizing:"border-box", overflowY:"auto"}}}>
+                                        <Dialog open={itemModal} onClose={()=>setItemModal(false)} PaperProps={{sx:{display:"flex", flexDirection:"column", minWidth: mobile? "80vw" :"50vw", maxWidth: mobile? "90vw" : "50vw",minHeight: "50vh", maxHeight:"90vh", padding:"10px", gap:"10px",boxSizing:"border-box", overflowY:"auto"}}}>
                                             <TextField type="text" value={itemName} onChange={(e) => setItemName(e.target.value)}/>
                                             <Select variant="outlined" onChange={(e) => setItemUnit(e.target.value)} value={itemUnit}>
                                                 <MenuItem value="PIECES">ks</MenuItem>
@@ -147,13 +160,15 @@ const ShopList = () => {
                                 }
                             </Box>
                         )}
-
-                        {categories
-                            .sort(sortByOrder)
-                            .map((category, index) => (
-                                <Category category={category} items={items} editable={editable} key={category.id} index={index}/>
-                            ))
-                        }
+                        <SortableContext items={categories.map(cat => "cat" + cat.id)} strategy={verticalListSortingStrategy}>
+                            {categories
+                                .sort(sortByOrder)
+                                .map(category => (
+                                    <Category category={category} items={items} editable={editable} key={category.id}/>
+                                ))
+                            }
+                        </SortableContext>
+                        <Box sx={{minHeight:"100px"}} id="nullCat">
                         {items
                             .filter(item => item.category === null)
                             .sort(sortByOrder)
@@ -161,8 +176,9 @@ const ShopList = () => {
                                 <Item item={item} editable={editable} key={item.id} index={index}/>
                             ))
                         }
-                        {dropArea && <DropArea/>}
+                        </Box>
                     </Box>
+                    </DndContext>
                 )}
         </PageLayout>
     )
