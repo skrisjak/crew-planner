@@ -16,13 +16,15 @@ public class ShoppingMapper {
     public static ResponseItem map(Item item) {
         ResponseItem responseItem = new ResponseItem();
         responseItem.setName(item.getName());
-        responseItem.setQuantity(item.getQuantity());
         responseItem.setUnit(item.getUnit());
         if (item.getCategory() != null) {
             responseItem.setCategory(map(item.getCategory()));
         }
         responseItem.setOrder(item.getOrder());
         responseItem.setId(item.getId());
+        if (item.getShopCartItem() != null) {
+            responseItem.setQuantity(item.getShopCartItem().getQuantity());
+        }
         return responseItem;
     }
 }

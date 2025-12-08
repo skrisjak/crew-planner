@@ -7,8 +7,8 @@ import lombok.Data;
 public class ResponseItem {
     private Long id;
     private String name;
-    private Double quantity;
     private MeasureUnit unit;
     private ResponseCategory category;
     private Long order;
+    private Double quantity;
 }

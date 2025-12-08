@@ -36,7 +36,6 @@ public class ShoppingService {
             newItem.setCategory(itemCategoryRepository.findById(item.getCategoryId()).orElse(null));
         }
         newItem.setUnit(item.getUnit());
-        newItem.setQuantity(item.getQuantity());
         return itemRepository.save(newItem);
     }
 
@@ -45,7 +44,6 @@ public class ShoppingService {
         Item update = itemRepository.findById(item.getId()).orElseThrow();
         update.setName(item.getName());
         update.setUnit(item.getUnit());
-        update.setQuantity(item.getQuantity());
 
         if (item.getCategoryId() != null) {
             update.setCategory(itemCategoryRepository.findById(item.getCategoryId()).orElse(null));
@@ -160,11 +158,12 @@ public class ShoppingService {
             Optional<Item> updatedItem = itemRepository.findById(item.getItemId());
             if (updatedItem.isPresent()) {
                 Item update = updatedItem.get();
-                if (update.getShopCartItem() != null) {
-                    shopCartItemRepository.delete(update.getShopCartItem());
-                    update.setShopCartItem(null);
+                ShopCartItem shopCartItem = update.getShopCartItem();
+                if (shopCartItem== null) {
+                    shopCartItem = new ShopCartItem();
+                    shopCartItem.setItem(update);
+                    update.setShopCartItem(shopCartItem);
                 }
-                ShopCartItem shopCartItem = new ShopCartItem();
                 shopCartItem.setQuantity(item.getQuantity());
                 shopCartItem.setNote(item.getNote());
                 shopCartItem.setItem(update);
@@ -179,21 +178,19 @@ public class ShoppingService {
         shopCartItemRepository.delete(delete);
     }
 
-    @Transactional
-    public void resolveShopCartItem(ShopCartItem item) {
-        Item update = item.getItem();
-        update.setQuantity(item.getQuantity() + update.getQuantity());
-        shopCartItemRepository.delete(item);
-        itemRepository.save(update);
-    }
 
+    @Transactional
     public void resolveShopCartItem(Long id) throws NoSuchElementException {
         ShopCartItem item = shopCartItemRepository.findById(id).orElseThrow();
-        resolveShopCartItem(item);
+        itemRepository.findByShopCartItem(item).ifPresent(shopCartItem -> {
+            shopCartItem.setShopCartItem(null);
+        });
     }
 
     public void resolveShopCartItems() {
-        List<ShopCartItem> items = shopCartItemRepository.findAll();
-        items.forEach(this::resolveShopCartItem);
+        itemRepository.findAll().forEach(item -> {
+            item.setShopCartItem(null);
+        });
+        shopCartItemRepository.deleteAll();
     }
 }

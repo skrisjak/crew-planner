@@ -8,10 +8,10 @@ import lombok.Data;
 @Entity
 public class Item extends BasicEntity {
     private String name;
-    private Double quantity;
     @Enumerated(EnumType.STRING)
     private MeasureUnit unit;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "shop_cart_item_id")
     private ShopCartItem shopCartItem;
     @ManyToOne
     private ItemCategory category;
