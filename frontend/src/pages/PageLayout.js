@@ -5,14 +5,16 @@ import {
     List,
     SwipeableDrawer,
     ListItemText,
-    IconButton, ListItemButton, Typography, MenuItem, Menu, LinearProgress,
+    IconButton, ListItemButton, Typography, MenuItem, Menu, LinearProgress, Icon,
 } from "@mui/material";
 import MenuIcon from '@mui/icons-material/Menu';
 import React, {useEffect, useState} from "react";
 import {useProfile} from "../hooks/UserProfile";
 import {useResponsive} from "../hooks/Responsive";
 import {useNavigate} from "react-router-dom";
-
+import {useSynchronizer} from "../hooks/Synchronizer";
+import CloudDoneIcon from '@mui/icons-material/CloudDone';
+import SyncIcon from '@mui/icons-material/Sync';
 
 function PageLayout(props) {
     const [open, setOpen] = useState(false);
@@ -21,6 +23,7 @@ function PageLayout(props) {
     const profile = useProfile((set)=> set.profile);
     const redirect = useNavigate();
     const {mobile, width} = useResponsive();
+    const {display, syncing} = useSynchronizer();
 
     useEffect(() => {
         loadProfile();
@@ -28,7 +31,14 @@ function PageLayout(props) {
 
     return (
         <Box container sx={{backgroundColor:"#f8fafd", height:"100svh",width:"100%", maxWidth:"100%", overflow:"hidden"}}>
-            <Box sx={{flexShrink:0,padding:"10px", display:"flex", justifyContent:"space-between", flexDirection:"row", alignItems:"center", height:"auto", minWidth:"100%",  maxWidth:"100%", boxSizing: "border-box", maxHeight: mobile? "10%": null}}>
+            <Box sx={{zIndex:5,position: "absolute", left: "50%", top: "20px", transform: "translateX(-50%)"}}>
+            <SyncIcon size="large" sx={{position:"absolute",inset:0,transition: "opacity 0.3s", animation: "spin 1s infinite linear", opacity: syncing? 1:0, "@keyframes spin": {
+                from: {transform:"rotate(0deg)"},
+                to: {transform:"rotate(360deg)"},
+                }}}/>
+            <CloudDoneIcon size="large" sx={{position:"absolute",inset:0,transition: "opacity 0.3s ease-in-out", opacity: (display && !syncing)? 1: 0}}/>
+            </Box>
+                <Box sx={{flexShrink:0,padding:"10px", display:"flex", justifyContent:"space-between", flexDirection:"row", alignItems:"center", height:"auto", minWidth:"100%",  maxWidth:"100%", boxSizing: "border-box", maxHeight: mobile? "10%": null}}>
                 <Box sx={{display:"inline-flex", alignItems:'center'}}>
                     {mobile ?
                         <IconButton onClick={() => setOpen(true)}><MenuIcon /></IconButton> :

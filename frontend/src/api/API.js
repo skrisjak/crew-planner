@@ -1,4 +1,5 @@
 import CONF from "./CONF";
+import shopList from "../pages/shopList/ShopList";
 
 class API {
 
@@ -30,9 +31,13 @@ class API {
             } else {
 
                 if (response.ok && ["POST", "GET"].includes(method)) {
-                    const responded = await response.json();
-                    console.log("←" + method + " " + url + "\n" + JSON.stringify(responded));
-                    return responded;
+                    try {
+                        const responded = await response.json();
+                        console.log("←" + method + " " + url + "\n" + JSON.stringify(responded));
+                        return responded;
+                    } catch (error) {
+                        return null;
+                    }
                 } else if (response.ok){
                     console.log("←" + method + " " + url + " OK");
                 }
@@ -158,6 +163,18 @@ class API {
 
     static deleteItem = async (itemId) => {
         return await API.doRequest("shopping/item/"+itemId, "DELETE");
+    }
+
+    static postShoppingList = async (shoppingList) => {
+        return await API.doRequest("shopping/shoppingList", "POST", shoppingList);
+    }
+
+    static resolveShoppingList = async () => {
+        return await API.doRequest("shopping/shoppingList", "PUT",);
+    }
+
+    static resolveShoppingListItem = async (itemId) => {
+        return await API.doRequest("shopping/shoppingListItem/"+itemId, "PUT");
     }
 }
 

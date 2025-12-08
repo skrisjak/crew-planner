@@ -56,7 +56,7 @@ export const useShopList = create((set, get) => ({
 
     removeItem: (itemId) => {
         const {items} = get();
-        set({items: items.filter(item => item.id !== itemId)})
+        set({items: items.filter(item => item.id !== itemId)});
     },
 
     updateCategory: async (category) => {
@@ -188,5 +188,57 @@ export const useShopList = create((set, get) => ({
 
     //sending items for order
     shopCart: new Map(),
+
+    addToCart: (item) => {
+        const {shopCart} = get();
+        const newShopCart = new Map(shopCart);
+        if (item.quantity && item.quantity > 0 ) {
+            newShopCart.set(item.itemId, item);
+        } else {
+            newShopCart.delete(item.itemId);
+        }
+        set({
+            shopCart: newShopCart
+        });
+    },
+
+    sendShopCart: async () => {
+        const {shopCart,items} = get();
+        const shopItems = shopCart.values().toArray();
+        const newItems = items.map(i => {
+            const shopItem = shopItems.find(it => it.itemId === i.id);
+            if (shopItem) {
+                return {
+                    ...i,
+                    quantity: shopItem.quantity,
+                }
+            } else {
+                return i;
+            }
+        })
+        try {
+            await API.postShoppingList(shopItems);
+            set({
+                shopCart: new Map(),
+                items: newItems
+            });
+        } catch (e) {
+            alert(e);
+        }
+    },
+
+    resolveShopCart: async () => {
+        try {
+            await API.resolveShoppingList();
+            const {items} = get();
+            set({
+                items: items.map(i => {
+                    return {...i, quantity: 0}
+                })
+            });
+        } catch (error) {
+            alert(error);
+        }
+    },
 
 }))

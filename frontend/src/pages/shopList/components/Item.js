@@ -1,13 +1,13 @@
-import {Box, IconButton, InputAdornment, MenuItem, Select, TextField, Typography} from "@mui/material";
-import {useState} from "react";
+import {Box, IconButton, InputAdornment, MenuItem, Select, TextField, Typography, useMediaQuery} from "@mui/material";
+import {useEffect, useState} from "react";
 import DeleteIcon from "@mui/icons-material/Delete";
-import DoneIcon from "@mui/icons-material/Done";
 import API from "../../../api/API";
 import {useShopList} from "../../../hooks/ShopList";
 import {useSortable} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {useDndMonitor} from "@dnd-kit/core";
 import DropArea from "../../dragDrop/DropArea";
+import {useSynchronizer} from "../../../hooks/Synchronizer";
 
 const getUnit = (u) => {
     switch (u) {
@@ -29,15 +29,16 @@ const Item = ({item, editable}) => {
 
     const [updateName, setUpdateName] = useState(item.name);
     const [updateUnit, setUpdateUnit] = useState(item.unit);
-    const [updateCategory, setUpdateCategory] = useState(item.category);
 
     const [over, setOver] = useState(false);
 
     const {
-        categories,
         updateItem,
         removeItem,
+        addToCart
     } = useShopList();
+
+    const {registerTask, resolveTask} = useSynchronizer();
 
     useDndMonitor({
         onDragMove: ({over, active})=> {setOver((over?.id === "item"+item.id) && active.id.startsWith("item"))},
@@ -45,15 +46,43 @@ const Item = ({item, editable}) => {
         onDragCancel: () => {setOver(false)},
     });
     const update = async () => {
+        const taskId = registerTask();
         try {
             const updated =  {
-                ...item, name: updateName, unit: updateUnit, categoryId: updateCategory?.id, category: updateCategory
+                ...item, name: updateName, unit: updateUnit,
             };
             await updateItem(updated);
         } catch (error) {
             alert(error);
+        } finally {
+            resolveTask(taskId);
         }
     }
+
+    useEffect(() => {
+        if (item.unit !== updateUnit) {
+            update();
+        }
+    }, [updateUnit]);
+
+
+    useEffect(() => {
+        if (!editable || item.name === updateName) {
+            return;
+        }
+        const timeout = setTimeout(() => update(), 1000);
+        return () => {clearTimeout(timeout)}
+    }, [updateName]);
+
+    const [updateQuantity, setUpdateQuantity] = useState(item.quantity);
+    useEffect(() => {
+        if (!item.quantity || item.quantity !== Number(updateQuantity)) {
+            addToCart({
+                itemId: item.id,
+                quantity: Number(updateQuantity)
+            });
+        }
+    }, [updateQuantity]);
 
     const del = async () => {
         try {
@@ -87,27 +116,16 @@ const Item = ({item, editable}) => {
                                 <MenuItem value="MILLILITRES">ml</MenuItem>
                                 <MenuItem value="LITRES">l</MenuItem>
                             </Select>
-                            <Select variant="outlined" onChange={(e) => setUpdateCategory(categories.find(cat => Number(e.target.value)===cat.id) || null)} value={updateCategory?.id || -1}>
-                                <MenuItem value={-1}>{" "} </MenuItem>
-                                {categories.map(category => (
-                                    <MenuItem value={category.id} key={category.id}>{category.name}</MenuItem>
-                                ))}
-                            </Select>
                         </Box>:
                         <Typography variant="h6" sx={{fontSize:"1em"}}> {item.name}</Typography>
                     }
                     {editable ?
-                        <Box>
-                            <IconButton onClick={update} sx={{color:"green"}}>
-                                <DoneIcon />
-                            </IconButton>
-                            <IconButton onClick={del} sx={{color:"red"}}>
-                                <DeleteIcon />
-                            </IconButton>
-                        </Box>
+                        <IconButton onClick={del} sx={{color:"red"}}>
+                            <DeleteIcon />
+                        </IconButton>
                         :
                         <Box>
-                            <TextField type="number" sx={{padding:0}} variant="outlined" slotProps={{input: {endAdornment: <InputAdornment position="end">{getUnit(item.unit)}</InputAdornment>}}} />
+                            <TextField value={updateQuantity} onChange={e => setUpdateQuantity(e.target.value)} type="number" sx={{padding:0}} variant="outlined" slotProps={{input: {endAdornment: <InputAdornment position="end">{getUnit(item.unit)}</InputAdornment>}}} />
                         </Box>
                     }
                 </Box>
