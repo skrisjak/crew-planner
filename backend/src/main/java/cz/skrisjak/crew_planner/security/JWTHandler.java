@@ -1,7 +1,7 @@
 package cz.skrisjak.crew_planner.security;
 
-import cz.skrisjak.crew_planner.model.User;
-import cz.skrisjak.crew_planner.repository.UserRepository;
+import cz.skrisjak.crew_planner.user.User;
+import cz.skrisjak.crew_planner.user.UserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.ServletException;

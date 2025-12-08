@@ -1,7 +1,7 @@
 package cz.skrisjak.crew_planner.security;
 
-import cz.skrisjak.crew_planner.model.User;
-import cz.skrisjak.crew_planner.service.UserService;
+import cz.skrisjak.crew_planner.user.User;
+import cz.skrisjak.crew_planner.user.UserService;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import jakarta.servlet.FilterChain;
