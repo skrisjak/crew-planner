@@ -2,6 +2,8 @@ package cz.skrisjak.crew_planner.shopping;
 
 import cz.skrisjak.crew_planner.shopping.data.PostItem;
 import cz.skrisjak.crew_planner.shopping.data.PostShopCartItem;
+import cz.skrisjak.crew_planner.shopping.data.ShoppingOrder;
+import cz.skrisjak.crew_planner.subscription.SubscriptionService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,12 +15,16 @@ public class ShoppingService {
     private final ItemRepository itemRepository;
     private final ShopCartItemRepository shopCartItemRepository;
     private final ItemCategoryRepository itemCategoryRepository;
+    private final ShoppingListRepository shoppingListRepository;
+    private final SubscriptionService subscriptionService;
 
     @Autowired
-    public ShoppingService(ItemRepository itemRepository, ShopCartItemRepository ShopCartItemRepository, ItemCategoryRepository itemCategoryRepository) {
+    public ShoppingService(ItemRepository itemRepository, ShopCartItemRepository ShopCartItemRepository, ItemCategoryRepository itemCategoryRepository, ShoppingListRepository shoppingListRepository, SubscriptionService subscriptionService) {
         this.itemRepository = itemRepository;
         this.shopCartItemRepository = ShopCartItemRepository;
         this.itemCategoryRepository = itemCategoryRepository;
+        this.shoppingListRepository = shoppingListRepository;
+        this.subscriptionService = subscriptionService;
     }
 
     public List<ItemCategory> getCategories() {
@@ -153,29 +159,55 @@ public class ShoppingService {
     }
 
     @Transactional
-    public void addShopCartItems(List<PostShopCartItem> items) {
-        items.forEach(item -> {
-            Optional<Item> updatedItem = itemRepository.findById(item.getItemId());
-            if (updatedItem.isPresent()) {
-                Item update = updatedItem.get();
-                ShopCartItem shopCartItem = update.getShopCartItem();
-                if (shopCartItem== null) {
-                    shopCartItem = new ShopCartItem();
-                    shopCartItem.setItem(update);
-                    update.setShopCartItem(shopCartItem);
-                }
-                shopCartItem.setQuantity(item.getQuantity());
-                shopCartItem.setNote(item.getNote());
-                shopCartItem.setItem(update);
-                update.setShopCartItem(shopCartItem);
-                shopCartItemRepository.save(shopCartItem);
+    public ShoppingList addShopCartItems(ShoppingOrder shoppingOrder) {
+
+        ShoppingList shoppingList = shoppingListRepository.findAll()
+                .stream()
+                .findFirst()
+                .orElseGet(() -> {
+                    ShoppingList sl = new ShoppingList();
+                    sl.setNote(shoppingOrder.getNote());
+                    return shoppingListRepository.save(sl);
+                });
+
+        shoppingList.setNote(shoppingOrder.getNote());
+
+        shoppingOrder.getItems().forEach(orderItem -> {
+
+            Item item = itemRepository.findById(orderItem.getItemId())
+                    .orElseThrow();
+
+            ShopCartItem shopCartItem = item.getShopCartItem();
+
+            if (shopCartItem == null) {
+                shopCartItem = new ShopCartItem();
+                shopCartItem.setItem(item);
+                item.setShopCartItem(shopCartItem);
+                shoppingList.addItem(shopCartItem);
+                shopCartItem = shopCartItemRepository.save(shopCartItem);
             }
+
+            shopCartItem.setQuantity(orderItem.getQuantity());
+            shopCartItem.setItem(item);
         });
+
+        subscriptionService.notifyShop(shoppingList);
+        return shoppingList;
     }
+
 
     public void deleteShopCartItem(Long id) throws NoSuchElementException {
         ShopCartItem delete = shopCartItemRepository.findById(id).orElseThrow();
         shopCartItemRepository.delete(delete);
+    }
+
+    public String getShopNote() {
+        List<ShoppingList> list = shoppingListRepository.findAll();
+        if (list.isEmpty()) {
+            return "";
+        } else {
+            return list.get(0).getNote();
+        }
     }
 
 
@@ -192,5 +224,6 @@ public class ShoppingService {
             item.setShopCartItem(null);
         });
         shopCartItemRepository.deleteAll();
+        shoppingListRepository.deleteAll();
     }
 }

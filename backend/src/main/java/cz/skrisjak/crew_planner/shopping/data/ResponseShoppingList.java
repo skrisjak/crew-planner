@@ -4,7 +4,8 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ShoppingList {
+public class ResponseShoppingList {
     private List<ResponseCategory> categories;
     private List<ResponseItem> items;
+    private String note;
 }

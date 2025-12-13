@@ -1,9 +1,7 @@
 package cz.skrisjak.crew_planner.shopping;
 
 import cz.skrisjak.crew_planner.util.BasicEntity;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
@@ -12,5 +10,8 @@ public class ShopCartItem extends BasicEntity {
     @OneToOne(mappedBy = "shopCartItem")
     private Item item;
     private Double quantity;
-    private String note;
+
+    @ManyToOne
+    @JoinColumn(name = "shopping_list_id", nullable = false)
+    private ShoppingList shoppingList;
 }

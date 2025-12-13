@@ -1,4 +1,6 @@
 package cz.skrisjak.crew_planner.shopping;
 
-public interface ShoppingListRepository {
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ShoppingListRepository extends JpaRepository<ShoppingList, Long> {
 }

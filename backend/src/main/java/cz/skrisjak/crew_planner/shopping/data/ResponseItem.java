@@ -10,5 +10,5 @@ public class ResponseItem {
     private MeasureUnit unit;
     private ResponseCategory category;
     private Long order;
-    private Double quantity;
+    private PostShopCartItem shopCartItem;
 }

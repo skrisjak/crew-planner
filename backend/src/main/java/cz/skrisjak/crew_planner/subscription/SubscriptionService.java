@@ -1,5 +1,8 @@
 package cz.skrisjak.crew_planner.subscription;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import cz.skrisjak.crew_planner.shopping.ShopCartItem;
+import cz.skrisjak.crew_planner.shopping.ShoppingList;
 import cz.skrisjak.crew_planner.user.Role;
 import cz.skrisjak.crew_planner.user.User;
 import cz.skrisjak.crew_planner.planning.WorkDaySlot;
@@ -38,11 +41,13 @@ public class SubscriptionService {
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd. MM.");
 
     private final PushSubscriptionRepository repository;
+    private final ObjectMapper objectMapper;
     private PushService pushService;
 
     @Autowired
-    public SubscriptionService(PushSubscriptionRepository repository) {
+    public SubscriptionService(PushSubscriptionRepository repository, ObjectMapper objectMapper) {
         this.repository = repository;
+        this.objectMapper = objectMapper;
     }
 
     public void subscribe(PushSubscription subscription, User user) {
@@ -52,35 +57,46 @@ public class SubscriptionService {
         }
     }
 
-    public void notifyShop() {
-        sendNotification("Nový nákup", user -> user.getRole() != Role.EMPLOYEE);
+    public void notifyShop(ShoppingList list) {
+        cz.skrisjak.crew_planner.subscription.Notification notification = new cz.skrisjak.crew_planner.subscription.Notification();
+        notification.setTitle("Nový nákup");
+        StringBuilder sb = new StringBuilder();
+        for (ShopCartItem item : list.getItems()) {
+            sb.append("- ").append(item.getItem().getName()).append(" ").append(item.getQuantity()).append(item.getItem().getUnit().unit).append("\n");
+        }
+        sb.append(list.getNote());
+        notification.setBody(sb.toString());
+        sendNotification(notification, user -> user.getRole() != Role.EMPLOYEE);
     }
 
     public void notifyPlanChange(User author) {
-        sendNotification("Změny v plánu", user -> !Objects.equals(user.getEmail(), author.getEmail()));
+        cz.skrisjak.crew_planner.subscription.Notification notification = new cz.skrisjak.crew_planner.subscription.Notification();
+        notification.setTitle("Nové směny");
+        sendNotification(notification, user -> !Objects.equals(user.getEmail(), author.getEmail()));
     }
 
     public void notifySlotChange(WorkDaySlot slot) {
-        String slotName;
+        cz.skrisjak.crew_planner.subscription.Notification notification = new cz.skrisjak.crew_planner.subscription.Notification();
+        notification.setTitle("Byl(a) jste přidán do směny");
 
         if (slot.getSlotName() == null || (slot.getSlotName().isEmpty() && slot.getDefaultSlot() != null)) {
-            slotName = slot.getDefaultSlot().getSlotName() + " " + slot.getWorkDay().getDate().format(formatter);
+            notification.setBody(slot.getDefaultSlot().getSlotName() + " " + slot.getWorkDay().getDate().format(formatter));
         } else {
-            slotName = slot.getSlotName() + " " + slot.getWorkDay().getDate().format(formatter);
+            notification.setBody(slot.getSlotName() + " " + slot.getWorkDay().getDate().format(formatter));
         }
 
         if (slot.getUser() != null) {
-            sendNotification(slotName, user -> Objects.equals(user.getEmail(), slot.getUser().getEmail()));
+            sendNotification(notification, user -> Objects.equals(user.getEmail(), slot.getUser().getEmail()));
         }
 
     }
-    private <T> void sendNotification(T payload, Predicate<User> userFilter) {
+    private <T> void sendNotification(cz.skrisjak.crew_planner.subscription.Notification payload, Predicate<User> userFilter) {
         if (pushService != null) {
             List<PushSubscription> subscriptions = repository.findAll();
             for (PushSubscription subscription : subscriptions) {
                 if (userFilter.test(subscription.getUser())) {
                     try {
-                        HttpResponse response = pushService.send(new Notification(new Subscription(subscription.getEndpoint(), new Subscription.Keys(subscription.getKeys().getP256dh(), subscription.getKeys().getAuth())), payload.toString()));
+                        HttpResponse response = pushService.send(new Notification(new Subscription(subscription.getEndpoint(), new Subscription.Keys(subscription.getKeys().getP256dh(), subscription.getKeys().getAuth())), objectMapper.writeValueAsString(payload)));
                         if (response.getStatusLine().getStatusCode() != 201) {
                             LOG.warn("Notification failed: {}", response.getStatusLine().toString() + "\n" + response.getEntity().toString());
                         }

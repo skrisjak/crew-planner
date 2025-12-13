@@ -2,6 +2,7 @@ package cz.skrisjak.crew_planner.shopping.data;
 
 import cz.skrisjak.crew_planner.shopping.Item;
 import cz.skrisjak.crew_planner.shopping.ItemCategory;
+import cz.skrisjak.crew_planner.shopping.ShopCartItem;
 
 public class ShoppingMapper {
 
@@ -22,9 +23,18 @@ public class ShoppingMapper {
         }
         responseItem.setOrder(item.getOrder());
         responseItem.setId(item.getId());
-        if (item.getShopCartItem() != null) {
-            responseItem.setQuantity(item.getShopCartItem().getQuantity());
-        }
+        responseItem.setShopCartItem(map(item.getShopCartItem()));
         return responseItem;
+    }
+
+    public static PostShopCartItem map(ShopCartItem shopCartItem) {
+        if (shopCartItem == null) {
+            return null;
+        }
+        PostShopCartItem postShopCartItem = new PostShopCartItem();
+        postShopCartItem.setId(shopCartItem.getId());
+        postShopCartItem.setItemId(shopCartItem.getItem().getId());
+        postShopCartItem.setQuantity(shopCartItem.getQuantity());
+        return postShopCartItem;
     }
 }

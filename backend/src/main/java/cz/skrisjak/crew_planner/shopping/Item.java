@@ -10,8 +10,7 @@ public class Item extends BasicEntity {
     private String name;
     @Enumerated(EnumType.STRING)
     private MeasureUnit unit;
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "shop_cart_item_id")
+    @OneToOne
     private ShopCartItem shopCartItem;
     @ManyToOne
     private ItemCategory category;

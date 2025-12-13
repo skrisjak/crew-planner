@@ -21,10 +21,11 @@ public class ShoppingController {
     }
 
     @GetMapping
-    public ShoppingList getItems() {
-        ShoppingList list = new ShoppingList();
+    public ResponseShoppingList getItems() {
+        ResponseShoppingList list = new ResponseShoppingList();
         list.setCategories(itemService.getCategories().stream().map(ShoppingMapper::map).collect(Collectors.toList()));
         list.setItems(itemService.getItems().stream().map(ShoppingMapper::map).collect(Collectors.toList()));
+        list.setNote(itemService.getShopNote());
         return list;
     }
 
@@ -54,9 +55,9 @@ public class ShoppingController {
     }
 
     @PostMapping("/shoppingList")
-    public ResponseEntity<Void> postShopping(@RequestBody List<PostShopCartItem> items) {
-        itemService.addShopCartItems(items);
-        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    public List<PostShopCartItem> postShopping(@RequestBody ShoppingOrder order) {
+        ShoppingList list = itemService.addShopCartItems(order);
+        return list.getItems().stream().map(ShoppingMapper::map).collect(Collectors.toList());
     }
 
     @PutMapping("/shoppingList")
