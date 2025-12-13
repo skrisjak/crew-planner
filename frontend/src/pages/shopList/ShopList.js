@@ -33,9 +33,11 @@ const ShopList = () => {
         addCategory,
         moveCategory,
         moveItem,
-        shopCart,
         sendShopCart,
-        resolveShopCart
+        resolveShopCart,
+        note,
+        setNote,
+        updated
     } = useShopList();
     useEffect(() => {
         getShopList();
@@ -196,8 +198,12 @@ const ShopList = () => {
                             </Box>
                         </Box>
                         </DndContext>
-                        <Box sx={{display:"flex", flexDirection:"row-reverse", padding:"10px", gap:"10px"}}>
-                            {shopCart.size > 0 &&
+                        {!editable &&
+                            <TextField type="text" variant="outlined" label="Poznámky" multiline minRows={2} value={note} onChange={e=> setNote(e.target.value)}  fullWidth/>
+                        }
+                        {!editable &&
+                            <Box sx={{display:"flex", flexDirection:"row-reverse", padding:"10px", gap:"10px"}}>
+                            {updated &&
                                 <Button variant="contained" onClick={()=>sendShopCart()}>
                                     Odeslat nákup
                                 </Button>
@@ -208,7 +214,8 @@ const ShopList = () => {
                                     Vyřídit nákup
                                 </Button>
                             }
-                        </Box>
+                            </Box>
+                        }
                     </>
                 )}
         </PageLayout>

@@ -74,15 +74,19 @@ const Item = ({item, editable}) => {
         return () => {clearTimeout(timeout)}
     }, [updateName]);
 
-    const [updateQuantity, setUpdateQuantity] = useState(item.quantity);
+    const [updateQuantity, setUpdateQuantity] = useState(item.shopCartItem?.quantity || 0);
     useEffect(() => {
-        if (!item.quantity || item.quantity !== Number(updateQuantity)) {
-            addToCart({
-                itemId: item.id,
-                quantity: Number(updateQuantity)
-            });
-        }
+        const updatedValue = Number(updateQuantity);
+
+        addToCart({
+            itemId: item.id,
+            quantity: updatedValue
+        });
     }, [updateQuantity]);
+
+    useEffect(()=> {
+        setUpdateQuantity(item.shopCartItem?.quantity || 0);
+    }, [item.shopCartItem]);
 
     const del = async () => {
         try {
@@ -99,11 +103,11 @@ const Item = ({item, editable}) => {
             <Box ref={setNodeRef} style={{
                 transform: CSS.Transform.toString(transform),
                 transition,
-            }} {...attributes} {...listeners}>
+            }} {...attributes} {...listeners} sx={{borderRadius:"5px",marginTop:"5px", marginX:"5px",paddingLeft:"0.5em"}}>
                 <Box sx={
                     {
-                        marginTop:"5px", marginX:"5px", display:"flex",
-                        justifyContent:"space-between", alignItems:"center", borderRadius:"5px",
+                        display:"flex",
+                        justifyContent:"space-between", alignItems:"center",
                         ":hover":{backgroundColor: editable?"lightgray": undefined}}}
                 >
                     {editable?

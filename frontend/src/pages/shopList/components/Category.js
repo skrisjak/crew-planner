@@ -13,7 +13,7 @@ import DropArea from "../../dragDrop/DropArea";
 import {useSynchronizer} from "../../../hooks/Synchronizer";
 
 export const itemsToBuyFirst = (item1, item2) => {
-    if (item2.quantity && (item1.quantity===null || item1.quantity===undefined || item1.quantity===0)) {
+    if (item2.shopCartItem !== null && item1.shopCartItem === null) {
         return 1;
     }
     return 0;
@@ -41,8 +41,13 @@ const Category = ({category, editable}) => {
     }, [items]);
 
     useEffect(() => {
-        setToBuy(myItems.filter(i => i.quantity > 0).length);
+        setToBuy(myItems.filter(i => i.shopCartItem !== null).length);
     }, [myItems]);
+
+    useEffect(()=> {
+        if (toBuy >0) {
+            setExpanded(true);
+        }},[toBuy]);
 
     const update = async () => {
         const taskId = registerTask();

@@ -61,6 +61,7 @@ function Home() {
         getPlan();
     }, [getPlan]);
 
+
     const registerNotification = async () => {
         if (!user) return;
 
@@ -71,16 +72,21 @@ function Home() {
                 return;
             }
 
-            const permission = await Notification.requestPermission();
-            if (permission !== "granted") {
+            const swReg = await navigator.serviceWorker.register('/sw.js');
+
+            const alreadyRegistered = localStorage.getItem("pushRegistered");
+            if (alreadyRegistered === "true") {
                 return;
             }
-
-            const swReg = await navigator.serviceWorker.register('/sw.js');
 
 
             let subscription = await swReg.pushManager.getSubscription();
             if (!subscription) {
+
+                const permission = await Notification.requestPermission();
+                if (permission !== "granted") {
+                    return;
+                }
 
                 const rsp = await fetch(CONF.origin + "vapidKey");
                 const key = await rsp.text();
@@ -92,6 +98,7 @@ function Home() {
             }
 
             await API.subscribe({subscription:subscription, stringy: JSON.stringify(subscription)});
+            localStorage.setItem("pushRegistered", "true");
         } catch (e) {
             console.error(e);
         }

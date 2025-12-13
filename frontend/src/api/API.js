@@ -28,6 +28,8 @@ class API {
                 window.location.assign("/?error=Unauthorized");
             } else if (response.status === 404 || response.status === 403) {
                 throw new Error("Not found");
+            }else if (response.status >= 500) {
+                throw new Error("Server error");
             } else {
 
                 if (response.ok && ["POST", "GET"].includes(method)) {

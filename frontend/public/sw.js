@@ -1,16 +1,17 @@
 self.addEventListener('push', event => {
-    let message = "";
-    if (event.data) {
-        message = event.data.text();
-    }
+    if (!event.data) return;
+
+    const message = event.data.json();
 
     const options = {
         icon: "logo192.png",
-        body:message
+        body:message.body || "",
+        silent: false,
+        vibrate : [200,100,200]
     }
 
     event.waitUntil(
-        self.registration.showNotification("Beach směny", options)
+        self.registration.showNotification(message.title, options)
     );
 });
 

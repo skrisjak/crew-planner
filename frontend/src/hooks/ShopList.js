@@ -21,7 +21,8 @@ export const useShopList = create((set, get) => ({
             set({
                 categories: response.categories,
                 items: response.items,
-                loading:false
+                loading:false,
+                note:response.note,
             })
         } catch (error) {
             alert(error);
@@ -188,39 +189,57 @@ export const useShopList = create((set, get) => ({
 
     //sending items for order
     shopCart: new Map(),
+    updated:false,
+    note : "",
 
     addToCart: (item) => {
-        const {shopCart} = get();
+        const {shopCart, updated} = get();
         const newShopCart = new Map(shopCart);
-        if (item.quantity && item.quantity > 0 ) {
+        let newUpdated = updated;
+        if (item.quantity > 0 ) {
             newShopCart.set(item.itemId, item);
+            newUpdated = true;
         } else {
             newShopCart.delete(item.itemId);
         }
         set({
-            shopCart: newShopCart
+            shopCart: newShopCart,
+            updated:newUpdated,
         });
     },
 
-    sendShopCart: async () => {
-        const {shopCart,items} = get();
-        const shopItems = shopCart.values().toArray();
-        const newItems = items.map(i => {
-            const shopItem = shopItems.find(it => it.itemId === i.id);
-            if (shopItem) {
-                return {
-                    ...i,
-                    quantity: shopItem.quantity,
-                }
-            } else {
-                return i;
-            }
+    setNote: (note) => {
+        set({
+            note: note,
+            updated:!(note===null || note==="")
         })
+    },
+
+    sendShopCart: async () => {
+        const {shopCart,items, note} = get();
+        const shopItems = shopCart.values().toArray();
         try {
-            await API.postShoppingList(shopItems);
+            const shopCartItems = await API.postShoppingList({
+                items:shopItems,
+                note:note
+            });
+
+            const newItems = items.map(i => {
+                const shopItem = shopCartItems.find(it => it.itemId === i.id);
+                if (shopItem) {
+                    return {
+                        ...i,
+                        shopCartItem: shopItem
+                    }
+                } else {
+                    return i;
+                }
+            });
+
             set({
                 shopCart: new Map(),
-                items: newItems
+                items: newItems,
+                updated:false,
             });
         } catch (e) {
             alert(e);
@@ -233,8 +252,11 @@ export const useShopList = create((set, get) => ({
             const {items} = get();
             set({
                 items: items.map(i => {
-                    return {...i, quantity: 0}
-                })
+                    return {...i, shopCartItem: null};
+                }),
+                shopCart: new Map(),
+                updated:false,
+                note:""
             });
         } catch (error) {
             alert(error);

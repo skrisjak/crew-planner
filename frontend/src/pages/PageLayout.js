@@ -31,12 +31,12 @@ function PageLayout(props) {
 
     return (
         <Box container sx={{backgroundColor:"#f8fafd", height:"100svh",width:"100%", maxWidth:"100%", overflow:"hidden"}}>
-            <Box sx={{zIndex:5,position: "absolute", left: "50%", top: "20px", transform: "translateX(-50%)"}}>
-            <SyncIcon size="large" sx={{position:"absolute",inset:0,transition: "opacity 0.3s", animation: "spin 1s infinite linear", opacity: syncing? 1:0, "@keyframes spin": {
+            <Box sx={{zIndex:5,position: "absolute", left: "50%", top: "20px", transform: "translateX(-50%)", backgroundColor:"white", borderRadius:"50%", height:"35px", width:"35px", display:"flex", justifyContent:"center", alignItems:"center", opacity: display? 1:0}}>
+            <SyncIcon size="large" sx={{position:"absolute",transition: "opacity 0.3s", animation: "spin 1s infinite linear", opacity: syncing? 1:0, "@keyframes spin": {
                 from: {transform:"rotate(0deg)"},
                 to: {transform:"rotate(360deg)"},
                 }}}/>
-            <CloudDoneIcon size="large" sx={{position:"absolute",inset:0,transition: "opacity 0.3s ease-in-out", opacity: (display && !syncing)? 1: 0}}/>
+            <CloudDoneIcon size="large" sx={{position:"absolute",transition: "opacity 0.3s ease-in-out", opacity: (display && !syncing)? 1: 0}}/>
             </Box>
                 <Box sx={{flexShrink:0,padding:"10px", display:"flex", justifyContent:"space-between", flexDirection:"row", alignItems:"center", height:"auto", minWidth:"100%",  maxWidth:"100%", boxSizing: "border-box", maxHeight: mobile? "10%": null}}>
                 <Box sx={{display:"inline-flex", alignItems:'center'}}>
