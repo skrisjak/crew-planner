@@ -36,6 +36,7 @@ function Login() {
             </IconButton>
               {error!=="" && <Alert severity="error">{error}</Alert>}
           </Box>
+          <a href="/privacy.html">Privacy policy</a>        
       </Box>
   );
 }
